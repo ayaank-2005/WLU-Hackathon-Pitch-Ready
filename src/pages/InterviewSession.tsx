@@ -70,10 +70,22 @@ export default function InterviewSession() {
 
   const startInterview = () => {
     setPhase('answering');
+  };
+
+  useEffect(() => {
+    if (phase !== 'answering' || timer.seconds > 0) return;
+
+    if (videoRef.current && streamRef.current) {
+      videoRef.current.srcObject = streamRef.current;
+    }
+
     timer.start();
     speech.start();
-    if (hasCamera && streamRef.current) eyeTracking.startTracking(streamRef.current);
-  };
+
+    if (hasCamera && streamRef.current) {
+      eyeTracking.startTracking(streamRef.current);
+    }
+  }, [phase]);
 
   const submitAnswer = useCallback(async () => {
     const answerText = speech.transcript.trim();
@@ -562,6 +574,10 @@ export default function InterviewSession() {
                 <span className={`text-xs font-bold ${eyeInfo.color} ${eyeInfo.bg} px-2 py-1 rounded-md`}>
                   {eyeInfo.label}
                 </span>
+              ) : eyeTracking.error ? (
+                <span className="text-xs font-bold text-red-500 bg-red-50 px-2 py-1 rounded-md">
+                  Error
+                </span>
               ) : (
                 <span className="text-xs font-bold text-slate-400 bg-slate-100 px-2 py-1 rounded-md">
                   {eyeTracking.isLoading ? 'Loading...' : hasCamera ? 'Starting...' : 'No Camera'}
@@ -575,7 +591,11 @@ export default function InterviewSession() {
               />
             </div>
             <div className="mt-2 text-xs text-slate-500 text-right">
-              {eyeTracking.isTracking ? `${eyeTracking.eyeContactPercent}%` : 'Tracking...'}
+              {eyeTracking.error
+                ? <span className="text-red-500">{eyeTracking.error}</span>
+                : eyeTracking.isTracking
+                  ? `${eyeTracking.eyeContactPercent}% looking at camera`
+                  : 'Tracking gaze...'}
             </div>
           </div>
 
