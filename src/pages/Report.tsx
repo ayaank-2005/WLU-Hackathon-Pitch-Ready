@@ -148,7 +148,7 @@ export default function Report() {
   const aiCalledRef = useRef(false);
 
   useEffect(() => {
-    if (!results || !apiKey || mode === 'interview' || aiCalledRef.current) return;
+    if (!results || mode === 'interview' || aiCalledRef.current) return;
     aiCalledRef.current = true;
     setAiLoading(true);
 
@@ -470,19 +470,7 @@ export default function Report() {
                 </div>
               ) : aiError ? (
                 <p className="text-sm text-red-500 py-2">
-                  AI analysis failed. Check that your Gemini API key is valid.{' '}
-                  <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener noreferrer" className="underline">
-                    Get a free key
-                  </a>
-                </p>
-              ) : !apiKey ? (
-                <p className="text-sm text-slate-500 py-2">
-                  Add a free Gemini API key in{' '}
-                  <button onClick={() => navigate('/setup')} className="text-indigo-600 underline font-medium">Setup</button>
-                  {' '}to get AI-powered feedback on your delivery.{' '}
-                  <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener noreferrer" className="text-indigo-600 underline">
-                    Get a free key
-                  </a>
+                  AI analysis failed. Please try again later.
                 </p>
               ) : null}
             </div>

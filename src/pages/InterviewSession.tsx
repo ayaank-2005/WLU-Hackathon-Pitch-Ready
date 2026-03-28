@@ -97,13 +97,9 @@ export default function InterviewSession() {
     setPhase('evaluating');
 
     let evaluation: AnswerEvaluation;
-    if (apiKey) {
-      try {
-        evaluation = await evaluateAnswer(apiKey, currentQuestion, answerText, config!.jobTitle);
-      } catch {
-        evaluation = evaluateAnswerHeuristic(currentQuestion, answerText);
-      }
-    } else {
+    try {
+      evaluation = await evaluateAnswer(apiKey ?? '', currentQuestion, answerText, config!.jobTitle);
+    } catch {
       evaluation = evaluateAnswerHeuristic(currentQuestion, answerText);
     }
 
@@ -478,7 +474,7 @@ export default function InterviewSession() {
                   </div>
 
                   <div className="flex gap-3">
-                    {currentEval.followUp && apiKey && (
+                    {currentEval.followUp && (
                       <button
                         onClick={handleFollowUp}
                         className="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-3 rounded-xl text-sm font-medium transition-all inline-flex items-center gap-2"
@@ -490,7 +486,7 @@ export default function InterviewSession() {
                     <button
                       onClick={moveToNext}
                       className={`px-5 py-3 rounded-xl text-sm font-medium transition-all inline-flex items-center gap-2 ${
-                        currentEval.followUp && apiKey
+                        currentEval.followUp
                           ? 'bg-slate-100 hover:bg-slate-200 text-slate-700'
                           : 'bg-blue-600 hover:bg-blue-700 text-white'
                       }`}

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { motion } from 'motion/react';
 import { ArrowLeft, ArrowRight, FileText, Minus, Plus, Gauge, Sparkles, Eye, EyeOff } from 'lucide-react';
 import { useSession } from '../context/SessionContext';
@@ -210,18 +210,17 @@ export default function Setup() {
               <span className="text-[10px] font-bold bg-green-100 text-green-700 px-1.5 py-0.5 rounded uppercase tracking-wide">Free</span>
             </h3>
             <p className="text-xs text-slate-400 mb-4">
-              Paste a free Google Gemini API key for personalized AI feedback after each session.{' '}
-              <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:text-blue-600 underline">
-                Get one here
-              </a>{' '}
-              (no credit card needed). Without a key you'll still get rule-based tips.
+              AI coaching is enabled by default. To use your own Groq API key instead, paste it below.{' '}
+              <Link to="/tutorial/groq" className="text-blue-500 hover:text-blue-600 underline">
+                How to get a key
+              </Link>
             </p>
             <div className="relative">
               <input
                 type={showKey ? 'text' : 'password'}
                 value={localApiKey}
                 onChange={(e) => setLocalApiKey(e.target.value)}
-                placeholder="AIza..."
+                placeholder="gsk_..."
                 className="w-full rounded-xl border border-white bg-white/50 px-4 py-3 pr-10 text-sm text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-all shadow-sm font-mono"
               />
               <button

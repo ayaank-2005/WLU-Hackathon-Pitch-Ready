@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { motion } from "motion/react";
 import {
   ArrowRight, Play, Eye, Activity, MessageSquareWarning, BarChart3,
@@ -517,25 +517,25 @@ export default function Landing() {
                 <div>
                   <h4 className="font-semibold text-slate-900 mb-4">Product</h4>
                   <ul className="space-y-3">
-                    <li><a href="#" className="hover:text-blue-600 transition-colors">Features</a></li>
-                    <li><a href="#" className="hover:text-blue-600 transition-colors">Pricing</a></li>
-                    <li><a href="#" className="hover:text-blue-600 transition-colors">Use Cases</a></li>
+                    <li><a href="#features" className="hover:text-blue-600 transition-colors">Features</a></li>
+                    <li><a href="#pricing" className="hover:text-blue-600 transition-colors">Pricing</a></li>
+                    <li><a href="#use-cases" className="hover:text-blue-600 transition-colors">Use Cases</a></li>
                   </ul>
                 </div>
                 <div>
                   <h4 className="font-semibold text-slate-900 mb-4">Resources</h4>
                   <ul className="space-y-3">
-                    <li><a href="#" className="hover:text-blue-600 transition-colors">Interview Tips</a></li>
-                    <li><a href="#" className="hover:text-blue-600 transition-colors">Pitch Templates</a></li>
-                    <li><a href="#" className="hover:text-blue-600 transition-colors">Blog</a></li>
+                    <li><Link to="/tips" className="hover:text-blue-600 transition-colors">Interview Tips</Link></li>
+                    <li><Link to="/templates" className="hover:text-blue-600 transition-colors">Pitch Templates</Link></li>
+                    <li><Link to="/blog" className="hover:text-blue-600 transition-colors">Blog</Link></li>
                   </ul>
                 </div>
                 <div>
                   <h4 className="font-semibold text-slate-900 mb-4">Company</h4>
                   <ul className="space-y-3">
-                    <li><a href="#" className="hover:text-blue-600 transition-colors">About Us</a></li>
-                    <li><a href="#" className="hover:text-blue-600 transition-colors">Contact</a></li>
-                    <li><a href="#" className="hover:text-blue-600 transition-colors">Privacy Policy</a></li>
+                    <li><Link to="/about" className="hover:text-blue-600 transition-colors">About Us</Link></li>
+                    <li><Link to="/contact" className="hover:text-blue-600 transition-colors">Contact</Link></li>
+                    <li><Link to="/privacy" className="hover:text-blue-600 transition-colors">Privacy Policy</Link></li>
                   </ul>
                 </div>
               </div>

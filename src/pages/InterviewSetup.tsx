@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import {
   ArrowLeft, Briefcase, Building2, FileText,
@@ -46,9 +46,9 @@ export default function InterviewSetup() {
     try {
       let questions: string[];
 
-      if (apiKey.trim()) {
+      try {
         questions = await generateQuestions(apiKey.trim(), jobTitle, jobDescription, questionCount);
-      } else {
+      } catch {
         questions = selectQuestions(roleType, questionCount);
       }
 
@@ -225,7 +225,7 @@ export default function InterviewSetup() {
                   className="overflow-hidden"
                 >
                   <p className="text-xs text-slate-500 mt-3 mb-3">
-                    Helps generate more targeted, role-specific questions when paired with an OpenAI key.
+                    Helps generate more targeted, role-specific questions with AI.
                   </p>
                   <div className="relative">
                     <textarea
@@ -253,7 +253,7 @@ export default function InterviewSetup() {
             >
               <div className="flex items-center gap-2 text-sm font-medium text-slate-700">
                 <Key className="w-4 h-4 text-amber-500" />
-                Connect OpenAI API
+                Connect Groq API
                 <span className="text-xs font-normal text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full">Optional</span>
               </div>
               <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform duration-200 ${showApiKey ? 'rotate-180' : ''}`} />
@@ -269,13 +269,16 @@ export default function InterviewSetup() {
                   className="overflow-hidden"
                 >
                   <p className="text-xs text-slate-500 mt-3 mb-3">
-                    Enables AI-generated questions tailored to your job description and real-time answer evaluation. Without it, questions come from our built-in bank. Your key is never stored.
+                    AI features work by default. To use your own Groq API key, paste it here.{' '}
+                    <Link to="/tutorial/groq" className="text-blue-500 hover:text-blue-600 underline">
+                      How to get a key
+                    </Link>
                   </p>
                   <input
                     type="password"
                     value={apiKey}
                     onChange={e => setApiKey(e.target.value)}
-                    placeholder="sk-..."
+                    placeholder="gsk_..."
                     className="w-full rounded-xl border border-white bg-white/50 px-4 py-3 text-sm font-mono placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-all shadow-sm"
                   />
                 </motion.div>

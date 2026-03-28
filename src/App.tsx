@@ -7,6 +7,13 @@ import Session from './pages/Session';
 import InterviewSetup from './pages/InterviewSetup';
 import InterviewSession from './pages/InterviewSession';
 import Report from './pages/Report';
+import InterviewTips from './pages/InterviewTips';
+import PitchTemplates from './pages/PitchTemplates';
+import Blog from './pages/Blog';
+import About from './pages/About';
+import Contact from './pages/Contact';
+import Privacy from './pages/Privacy';
+import GroqTutorial from './pages/GroqTutorial';
 
 export default function App() {
   return (
@@ -20,6 +27,13 @@ export default function App() {
           <Route path="/interview/setup" element={<InterviewSetup />} />
           <Route path="/interview/session" element={<InterviewSession />} />
           <Route path="/report" element={<Report />} />
+          <Route path="/tips" element={<InterviewTips />} />
+          <Route path="/templates" element={<PitchTemplates />} />
+          <Route path="/blog" element={<Blog />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="/privacy" element={<Privacy />} />
+          <Route path="/tutorial/groq" element={<GroqTutorial />} />
         </Routes>
       </SessionProvider>
     </BrowserRouter>

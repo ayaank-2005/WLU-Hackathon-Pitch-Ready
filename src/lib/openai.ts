@@ -1,19 +1,23 @@
-const API_URL = 'https://api.openai.com/v1/chat/completions';
-const MODEL = 'gpt-4o-mini';
+const GROQ_URL = 'https://api.groq.com/openai/v1/chat/completions';
+const PROXY_URL = '/api/chat';
+const MODEL = 'openai/gpt-oss-20b';
 
 async function chatCompletion(apiKey: string, messages: { role: string; content: string }[], temperature = 0.7): Promise<string> {
-  const res = await fetch(API_URL, {
+  const useProxy = !apiKey;
+  const url = useProxy ? PROXY_URL : GROQ_URL;
+
+  const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+  if (!useProxy) headers['Authorization'] = `Bearer ${apiKey}`;
+
+  const res = await fetch(url, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${apiKey}`,
-    },
+    headers,
     body: JSON.stringify({ model: MODEL, messages, temperature, max_tokens: 1024 }),
   });
 
   if (!res.ok) {
     const err = await res.text();
-    throw new Error(`OpenAI API error (${res.status}): ${err}`);
+    throw new Error(`Groq API error (${res.status}): ${err}`);
   }
 
   const data = await res.json();
@@ -86,39 +90,6 @@ Evaluate the answer and respond with ONLY a JSON object (no markdown, no other t
   }
 }
 
-const GEMINI_MODELS = [
-  'gemini-2.0-flash',
-  'gemini-1.5-flash',
-];
-
-async function geminiGenerate(apiKey: string, prompt: string): Promise<string> {
-  let lastError = '';
-
-  for (const model of GEMINI_MODELS) {
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
-    const res = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: [{ parts: [{ text: prompt }] }],
-        generationConfig: { temperature: 0.6, maxOutputTokens: 1024 },
-      }),
-    });
-
-    if (res.ok) {
-      const data = await res.json();
-      return data.candidates?.[0]?.content?.parts?.[0]?.text?.trim() ?? '';
-    }
-
-    lastError = await res.text();
-    if (res.status === 403 || res.status === 401) {
-      throw new Error(`Gemini auth error: ${lastError}`);
-    }
-  }
-
-  throw new Error(`Gemini API error: ${lastError}`);
-}
-
 export async function generatePresentationTips(
   apiKey: string,
   data: {
@@ -170,7 +141,7 @@ Return ONLY a JSON array of 4-5 tip strings. Each tip should be 1-2 sentences, s
 
 Example format: ["Your opening lacked a hook...", "You said 'like' 8 times..."]`;
 
-  const raw = await geminiGenerate(apiKey, prompt);
+  const raw = await chatCompletion(apiKey, [{ role: 'user', content: prompt }], 0.6);
 
   try {
     const match = raw.match(/\[[\s\S]*\]/);
