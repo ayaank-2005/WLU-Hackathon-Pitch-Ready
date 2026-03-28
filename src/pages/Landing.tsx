@@ -124,19 +124,37 @@ export default function Landing() {
 
           {/* App UI */}
           <div className="flex flex-col md:flex-row h-[500px] md:h-[600px] bg-white">
-            {/* Left: Teleprompter */}
-            <div className="flex-1 p-8 md:p-12 border-r border-slate-100 relative overflow-hidden bg-slate-50/30">
-              <div className="absolute top-6 left-8 flex items-center gap-2 text-slate-400 text-sm font-medium bg-white px-3 py-1.5 rounded-full shadow-sm border border-slate-100">
-                <Mic className="w-4 h-4 text-blue-500" />
-                Listening...
+            {/* Left: Teleprompter & Camera */}
+            <div className="flex-1 p-8 md:p-12 border-r border-slate-100 relative overflow-hidden bg-slate-50/30 flex flex-col">
+              <div className="flex items-center justify-between mb-8">
+                <div className="flex items-center gap-2 text-slate-400 text-sm font-medium bg-white px-3 py-1.5 rounded-full shadow-sm border border-slate-100">
+                  <Mic className="w-4 h-4 text-blue-500" />
+                  Listening...
+                </div>
               </div>
 
-              <div className="h-full flex flex-col justify-center max-w-2xl mx-auto mt-4">
+              {/* Teleprompter Text */}
+              <div className="flex-1 flex flex-col justify-start max-w-2xl mx-auto w-full relative z-10">
                 <div className="text-2xl md:text-4xl leading-[1.5] font-medium text-slate-300 transition-all duration-500">
-                  <span className="text-slate-300">Good morning everyone. Today I want to talk about </span>
-                  <span className="text-slate-800 bg-blue-50 rounded-lg px-1 py-0.5 shadow-[0_0_0_2px_rgba(239,246,255,1)]">the future of sustainable energy</span>
-                  <span className="text-slate-300"> and how our new initiative will reduce campus waste by 40% over the next two years. </span>
-                  <span className="text-slate-200">As you can see on the first slide...</span>
+                  <span className="text-slate-300">Hi, thank you so much for taking the time to meet with me today. </span>
+                  <span className="text-slate-800 bg-blue-50 rounded-lg px-1 py-0.5 shadow-[0_0_0_2px_rgba(239,246,255,1)]">My name is Alex</span>
+                  <span className="text-slate-300"> and I'm currently finishing my degree in Computer Science. </span>
+                  <span className="text-slate-200">I've been following your company's work...</span>
+                </div>
+              </div>
+
+              {/* Mock Webcam Preview */}
+              <div className="absolute bottom-8 left-8 right-8 md:right-auto md:w-72 h-48 bg-slate-900 rounded-2xl overflow-hidden shadow-2xl border-2 border-white z-20">
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent z-10 flex items-end p-4">
+                  <div className="flex items-center gap-2">
+                    <div className="w-2.5 h-2.5 rounded-full bg-green-400 shadow-[0_0_8px_rgba(74,222,128,0.8)]"></div>
+                    <span className="text-xs font-medium text-white/90">Good eye contact</span>
+                  </div>
+                </div>
+                {/* Abstract person silhouette to represent webcam */}
+                <div className="absolute inset-0 flex items-center justify-center opacity-40">
+                  <div className="w-24 h-24 rounded-full bg-white/20 absolute top-4"></div>
+                  <div className="w-40 h-32 rounded-t-[3rem] bg-white/20 absolute bottom-0"></div>
                 </div>
               </div>
 
