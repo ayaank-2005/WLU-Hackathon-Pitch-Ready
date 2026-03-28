@@ -86,21 +86,24 @@ export default function ModeSelect() {
                   Presentation Mode
                 </h2>
                 <p className="text-slate-500 leading-relaxed mb-8 flex-1">
-                  Practice your pitch, class presentation, or thesis defense with a smart teleprompter and live delivery feedback.
+                  Master your delivery for pitches, class presentations, and keynotes. Read naturally from a smart teleprompter while our AI analyzes your performance.
                 </p>
 
-                <div className="space-y-3 mb-8">
+                <div className="grid grid-cols-1 gap-4 mb-8">
                   {[
-                    { icon: FileText, text: "Auto-scrolling teleprompter" },
-                    { icon: Eye, text: "Live eye contact tracking" },
-                    { icon: Activity, text: "Pace & rhythm analysis" },
-                    { icon: MessageSquareWarning, text: "Filler word detection" },
-                  ].map(({ icon: Icon, text }) => (
-                    <div key={text} className="flex items-center gap-3 text-sm text-slate-600 font-medium">
-                      <div className="w-6 h-6 rounded-full bg-white/80 border border-slate-100 flex items-center justify-center shrink-0">
-                        <Icon className="w-3.5 h-3.5 text-blue-500" />
+                    { icon: FileText, title: "Smart Teleprompter", desc: "Auto-scrolls to match your reading speed" },
+                    { icon: Eye, title: "Live Eye Tracking", desc: "Monitors your audience engagement" },
+                    { icon: Activity, title: "Pace Analysis", desc: "Tracks your words-per-minute in real-time" },
+                    { icon: MessageSquareWarning, title: "Filler Detection", desc: "Catches 'ums' and 'ahs' instantly" },
+                  ].map(({ icon: Icon, title, desc }) => (
+                    <div key={title} className="flex items-start gap-3">
+                      <div className="w-8 h-8 rounded-xl bg-white/80 border border-slate-100 shadow-sm flex items-center justify-center shrink-0 mt-0.5">
+                        <Icon className="w-4 h-4 text-blue-600" />
                       </div>
-                      {text}
+                      <div>
+                        <div className="text-sm font-semibold text-slate-800">{title}</div>
+                        <div className="text-xs text-slate-500 leading-relaxed">{desc}</div>
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -134,21 +137,24 @@ export default function ModeSelect() {
                   Interview Mode
                 </h2>
                 <p className="text-slate-500 leading-relaxed mb-8 flex-1">
-                  Simulate a real interview with AI-generated questions tailored to your role and job description.
+                  Ace your next job interview with dynamic, AI-driven mock sessions. Generate custom questions from any job description and get instant feedback.
                 </p>
 
-                <div className="space-y-3 mb-8">
+                <div className="grid grid-cols-1 gap-4 mb-8">
                   {[
-                    { icon: Sparkles, text: "AI question generation from JD" },
-                    { icon: Mic, text: "Speak your answers naturally" },
-                    { icon: Eye, text: "Eye contact & delivery tracking" },
-                    { icon: Sparkles, text: "Per-answer AI feedback" },
-                  ].map(({ icon: Icon, text }, i) => (
-                    <div key={i} className="flex items-center gap-3 text-sm text-slate-600 font-medium">
-                      <div className="w-6 h-6 rounded-full bg-white/80 border border-slate-100 flex items-center justify-center shrink-0">
-                        <Icon className="w-3.5 h-3.5 text-indigo-500" />
+                    { icon: Sparkles, title: "Tailored Questions", desc: "AI generates prompts from your job description" },
+                    { icon: Mic, title: "Voice-First", desc: "Speak your answers naturally while we transcribe" },
+                    { icon: Users, title: "Smart Follow-ups", desc: "AI adapts and asks clarifying questions" },
+                    { icon: FileText, title: "Detailed Feedback", desc: "Get actionable advice on your content and delivery" },
+                  ].map(({ icon: Icon, title, desc }) => (
+                    <div key={title} className="flex items-start gap-3">
+                      <div className="w-8 h-8 rounded-xl bg-white/80 border border-slate-100 shadow-sm flex items-center justify-center shrink-0 mt-0.5">
+                        <Icon className="w-4 h-4 text-indigo-600" />
                       </div>
-                      {text}
+                      <div>
+                        <div className="text-sm font-semibold text-slate-800">{title}</div>
+                        <div className="text-xs text-slate-500 leading-relaxed">{desc}</div>
+                      </div>
                     </div>
                   ))}
                 </div>
