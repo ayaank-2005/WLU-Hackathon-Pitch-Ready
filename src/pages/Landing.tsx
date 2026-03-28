@@ -64,21 +64,21 @@ export default function Landing() {
             className="flex flex-col items-center"
           >
             {/* Announcement Pill */}
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/60 border border-blue-100 text-blue-800 text-sm font-medium mb-8 backdrop-blur-md hover:bg-white/80 transition-colors cursor-pointer shadow-sm">
-              <span className="flex h-2 w-2 rounded-full bg-blue-500"></span>
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/80 border border-blue-100 text-blue-800 text-sm font-medium mb-8 backdrop-blur-md hover:bg-white transition-colors cursor-pointer shadow-sm">
+              <span className="flex h-2 w-2 rounded-full bg-blue-500 animate-pulse"></span>
               Announcing our Hackathon Beta
               <ArrowRight className="w-4 h-4 ml-1 opacity-70" />
             </div>
 
             {/* Headline */}
-            <h1 className="text-5xl md:text-7xl font-medium text-slate-900 tracking-tight leading-[1.1] mb-6 max-w-4xl">
+            <h1 className="text-5xl md:text-7xl font-semibold text-slate-900 tracking-tight leading-[1.1] mb-6 max-w-4xl">
               Ace Every Presentation <br className="hidden md:block" />
               & Interview
             </h1>
 
             {/* Subheadline */}
             <p className="text-lg md:text-xl text-slate-600 font-normal max-w-2xl mx-auto mb-10 leading-relaxed">
-              Practice presentations and interviews with your webcam, see yourself speak, and get real-time AI feedback on eye contact, pacing, and filler words.
+              Practice with your webcam, see yourself speak, and get real-time AI feedback on eye contact, pacing, and filler words.
             </p>
 
             {/* CTAs */}
@@ -159,7 +159,7 @@ export default function Landing() {
               </div>
 
               <div className="absolute right-4 top-1/2 -translate-y-1/2 w-1.5 h-32 bg-slate-100 rounded-full overflow-hidden">
-                <div className="w-full h-1/3 bg-slate-300 rounded-full"></div>
+                <div className="w-full h-1/3 bg-blue-400 rounded-full shadow-[0_0_8px_rgba(96,165,250,0.6)]"></div>
               </div>
             </div>
 
@@ -256,56 +256,80 @@ export default function Landing() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
             {/* Card 1 */}
-            <div className="bg-white rounded-3xl p-8 border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
-              <div className="w-12 h-12 rounded-2xl bg-blue-50 flex items-center justify-center mb-6">
+            <div className="bg-white rounded-[2rem] p-8 border border-slate-100 shadow-sm hover:shadow-md hover:border-blue-100 transition-all flex flex-col group">
+              <div className="w-12 h-12 rounded-2xl bg-blue-50 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
                 <Eye className="w-6 h-6 text-blue-600" />
               </div>
               <h3 className="text-xl font-semibold text-slate-900 mb-3">Live Eye Tracking</h3>
-              <p className="text-slate-500 mb-8 leading-relaxed">
+              <p className="text-slate-500 mb-8 leading-relaxed flex-1">
                 See yourself on camera while AI tracks your gaze. Know exactly when you're making eye contact and when you're drifting to your notes.
               </p>
-              <div className="bg-slate-50 rounded-xl p-4 border border-slate-100">
-                <div className="flex justify-between items-center mb-2">
-                  <span className="text-sm font-medium text-slate-700">Camera Focus</span>
-                  <span className="text-xs font-bold text-green-600 bg-green-100 px-2 py-0.5 rounded">85%</span>
+              <div className="bg-slate-50/50 rounded-2xl p-5 border border-slate-100 mt-auto">
+                <div className="flex justify-between items-center mb-3">
+                  <span className="text-sm font-semibold text-slate-700">Camera Focus</span>
+                  <span className="text-xs font-bold text-green-700 bg-green-100 px-2.5 py-1 rounded-md">85%</span>
                 </div>
-                <div className="h-2 bg-slate-200 rounded-full overflow-hidden">
-                  <div className="h-full bg-green-500 w-[85%] rounded-full"></div>
+                <div className="h-2.5 bg-slate-200/80 rounded-full overflow-hidden">
+                  <div className="h-full bg-green-500 w-[85%] rounded-full shadow-[0_0_10px_rgba(34,197,94,0.4)]"></div>
                 </div>
               </div>
             </div>
 
             {/* Card 2 */}
-            <div className="bg-white rounded-3xl p-8 border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
-              <div className="w-12 h-12 rounded-2xl bg-amber-50 flex items-center justify-center mb-6">
+            <div className="bg-white rounded-[2rem] p-8 border border-slate-100 shadow-sm hover:shadow-md hover:border-blue-100 transition-all flex flex-col group">
+              <div className="w-12 h-12 rounded-2xl bg-amber-50 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
                 <Activity className="w-6 h-6 text-amber-600" />
               </div>
               <h3 className="text-xl font-semibold text-slate-900 mb-3">Pace & Rhythm</h3>
-              <p className="text-slate-500 mb-8 leading-relaxed">
+              <p className="text-slate-500 mb-8 leading-relaxed flex-1">
                 Whether it's a pitch or a behavioral interview, pacing matters. We monitor your words-per-minute live and nudge you to slow down when you rush.
               </p>
-              <div className="bg-slate-50 rounded-xl p-4 border border-slate-100 flex items-end gap-3 h-[76px]">
+              <div className="bg-slate-50/50 rounded-2xl p-5 border border-slate-100 flex items-end gap-2.5 h-[100px] mt-auto relative">
+                <div className="absolute inset-x-0 bottom-[40%] border-t border-dashed border-slate-300 z-0"></div>
                 {[40, 60, 100, 140, 160, 130].map((h, i) => (
-                  <div key={i} className={`flex-1 rounded-t-sm ${i === 4 ? 'bg-amber-400' : 'bg-blue-200'}`} style={{ height: `${(h/160)*100}%` }}></div>
+                  <div key={i} className={`flex-1 rounded-t-md transition-all duration-500 z-10 ${i === 4 ? 'bg-amber-400 shadow-[0_0_10px_rgba(251,191,36,0.4)]' : 'bg-blue-200/60 group-hover:bg-blue-300/60'}`} style={{ height: `${(h/160)*100}%` }}></div>
                 ))}
               </div>
             </div>
+          </div>
 
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {/* Card 3 */}
-            <div className="bg-white rounded-3xl p-8 border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
-              <div className="w-12 h-12 rounded-2xl bg-red-50 flex items-center justify-center mb-6">
+            <div className="bg-white rounded-[2rem] p-8 border border-slate-100 shadow-sm hover:shadow-md hover:border-blue-100 transition-all flex flex-col group">
+              <div className="w-12 h-12 rounded-2xl bg-red-50 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
                 <MessageSquareWarning className="w-6 h-6 text-red-600" />
               </div>
               <h3 className="text-xl font-semibold text-slate-900 mb-3">Filler Word Detection</h3>
-              <p className="text-slate-500 mb-8 leading-relaxed">
+              <p className="text-slate-500 mb-8 leading-relaxed flex-1">
                 Catch the "ums", "ahs", and "likes" before your interviewer or professor does. Get a detailed breakdown of your crutch words after every run.
               </p>
-              <div className="bg-slate-50 rounded-xl p-4 border border-slate-100 flex flex-wrap gap-2">
-                <span className="px-3 py-1.5 bg-white border border-red-100 text-red-600 rounded-lg text-sm font-medium shadow-sm">like (4)</span>
-                <span className="px-3 py-1.5 bg-white border border-red-100 text-red-600 rounded-lg text-sm font-medium shadow-sm">um (2)</span>
-                <span className="px-3 py-1.5 bg-white border border-red-100 text-red-600 rounded-lg text-sm font-medium shadow-sm">basically (1)</span>
+              <div className="bg-slate-50/50 rounded-2xl p-5 border border-slate-100 flex flex-wrap gap-2.5 mt-auto">
+                <span className="px-3 py-1.5 bg-white border border-red-200 text-red-600 rounded-lg text-sm font-semibold shadow-sm group-hover:bg-red-50 group-hover:border-red-300 transition-colors">like (4)</span>
+                <span className="px-3 py-1.5 bg-white border border-red-200 text-red-600 rounded-lg text-sm font-semibold shadow-sm group-hover:bg-red-50 group-hover:border-red-300 transition-colors">um (2)</span>
+                <span className="px-3 py-1.5 bg-white border border-red-200 text-red-600 rounded-lg text-sm font-semibold shadow-sm group-hover:bg-red-50 group-hover:border-red-300 transition-colors">basically (1)</span>
+              </div>
+            </div>
+
+            {/* Card 4 */}
+            <div className="bg-white rounded-[2rem] p-8 border border-slate-100 shadow-sm hover:shadow-md hover:border-blue-100 transition-all flex flex-col group">
+              <div className="w-12 h-12 rounded-2xl bg-purple-50 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                <Sparkles className="w-6 h-6 text-purple-600" />
+              </div>
+              <h3 className="text-xl font-semibold text-slate-900 mb-3">Content & Answer Analysis</h3>
+              <p className="text-slate-500 mb-8 leading-relaxed flex-1">
+                It's not just how you speak, it's what you say. Our AI analyzes the actual content of your answers and gives you notes on what you did well and what to improve.
+              </p>
+              <div className="bg-slate-50/50 rounded-2xl p-5 border border-slate-100 mt-auto space-y-3">
+                <div className="flex gap-3 items-start bg-white p-3 rounded-xl border border-slate-200 shadow-sm group-hover:border-purple-200 transition-colors">
+                  <div className="w-5 h-5 rounded-full bg-green-100 text-green-600 flex items-center justify-center shrink-0 mt-0.5"><CheckCircle2 className="w-3 h-3" /></div>
+                  <p className="text-xs text-slate-700 font-medium leading-relaxed">Strong opening hook! You clearly established the problem right away.</p>
+                </div>
+                <div className="flex gap-3 items-start bg-white p-3 rounded-xl border border-slate-200 shadow-sm group-hover:border-purple-200 transition-colors">
+                  <div className="w-5 h-5 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center shrink-0 mt-0.5"><span className="text-[10px] font-bold">!</span></div>
+                  <p className="text-xs text-slate-700 font-medium leading-relaxed">Your answer lacked a specific metric. Try adding a concrete number.</p>
+                </div>
               </div>
             </div>
           </div>
@@ -324,16 +348,16 @@ export default function Landing() {
             {[
               { icon: LayoutTemplate, title: "Smart Teleprompter", desc: "Auto-scrolling script that matches your reading speed perfectly." },
               { icon: LineChart, title: "Detailed Analytics", desc: "Analyze performance based on pace, eye contact, and clarity." },
-              { icon: Sparkles, title: "Personalized Tips", desc: "Get actionable advice on how to improve after every session." },
+              { icon: Sparkles, title: "Content Analysis", desc: "Get actionable advice on your actual answers and script content." },
               { icon: Timer, title: "Real-time HUD", desc: "Gain insights into your delivery as it happens in real time." },
               { icon: Shield, title: "Privacy First", desc: "Everything runs in your browser. No video is ever recorded or uploaded." },
               { icon: Laptop, title: "No Installation", desc: "Works instantly in Chrome or Edge. No clunky software to download." },
               { icon: FileText, title: "Custom Scripts", desc: "Paste your own notes or use our built-in templates for pitches and interviews." },
               { icon: CheckCircle2, title: "Progress Tracking", desc: "Compare your current attempt against your previous ones to see growth." }
             ].map((feature, i) => (
-              <div key={i} className="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm hover:shadow-md hover:border-blue-100 transition-all group">
-                <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center mb-4 group-hover:bg-blue-600 transition-colors">
-                  <feature.icon className="w-5 h-5 text-blue-600 group-hover:text-white transition-colors" />
+              <div key={i} className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm hover:shadow-md hover:border-blue-200 transition-all group">
+                <div className="w-12 h-12 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center mb-5 group-hover:bg-blue-600 group-hover:border-blue-600 transition-colors">
+                  <feature.icon className="w-6 h-6 text-slate-600 group-hover:text-white transition-colors" />
                 </div>
                 <h4 className="text-base font-semibold text-slate-900 mb-2">{feature.title}</h4>
                 <p className="text-sm text-slate-500 leading-relaxed">{feature.desc}</p>
@@ -344,23 +368,32 @@ export default function Landing() {
       </section>
 
       {/* Use Cases */}
-      <section className="py-24 bg-slate-50 border-y border-slate-100 overflow-hidden">
-        <div className="max-w-4xl mx-auto px-6 text-center">
-          <h2 className="text-3xl md:text-4xl font-medium text-slate-900 mb-6 tracking-tight">Practice for any high-stakes moment.</h2>
-          <p className="text-lg text-slate-500 mb-16">Whether it's a grade, a job offer, or funding on the line — be ready.</p>
+      <section className="relative py-24 border-y border-slate-200/60 overflow-hidden bg-slate-50/50">
+        {/* Subtle background glow to make glass pop */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] bg-blue-100/50 rounded-full blur-[100px] opacity-60 pointer-events-none"></div>
+        
+        <div className="relative max-w-6xl mx-auto px-6">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-medium text-slate-900 mb-6 tracking-tight">Practice for any high-stakes moment.</h2>
+            <p className="text-lg text-slate-500">Whether it's a grade, a job offer, or funding on the line — be ready.</p>
+          </div>
           
-          <div className="flex flex-wrap justify-center gap-8 md:gap-20">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
-              { icon: GraduationCap, label: "Class Presentations", color: "bg-purple-100 text-purple-600" },
-              { icon: Briefcase, label: "Job & Co-op Interviews", color: "bg-blue-100 text-blue-600" },
-              { icon: Users, label: "Startup Pitches", color: "bg-emerald-100 text-emerald-600" },
-              { icon: Video, label: "Thesis & Case Defenses", color: "bg-rose-100 text-rose-600" }
+              { icon: GraduationCap, label: "Class Presentations", desc: "Nail your delivery and engage your classmates without relying on notes." },
+              { icon: Briefcase, label: "Job & Co-op Interviews", desc: "Answer behavioral questions with perfect pacing and confidence." },
+              { icon: Users, label: "Startup Pitches", desc: "Project authority and clarity when speaking to potential investors." },
+              { icon: Video, label: "Thesis & Case Defenses", desc: "Defend your work clearly while maintaining strong eye contact." }
             ].map((item, i) => (
-              <div key={i} className="flex flex-col items-center gap-4">
-                <div className={`w-20 h-20 rounded-[1.5rem] flex items-center justify-center ${item.color} shadow-sm`}>
-                  <item.icon className="w-8 h-8" />
+              <div key={i} className="group relative bg-white/60 backdrop-blur-xl border border-white shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] rounded-[2rem] p-8 transition-all duration-300 hover:-translate-y-1 flex flex-col">
+                <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-white/0 rounded-[2rem] pointer-events-none"></div>
+                <div className="relative flex-1 flex flex-col">
+                  <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-slate-50 to-slate-100/50 border border-slate-200/60 shadow-sm flex items-center justify-center mb-6 group-hover:scale-110 group-hover:bg-white group-hover:border-blue-100 transition-all duration-300">
+                    <item.icon className="w-6 h-6 text-slate-600 group-hover:text-blue-600 transition-colors" />
+                  </div>
+                  <h3 className="font-semibold text-slate-900 mb-3 text-lg tracking-tight">{item.label}</h3>
+                  <p className="text-sm text-slate-500 leading-relaxed">{item.desc}</p>
                 </div>
-                <span className="font-medium text-slate-700 text-sm">{item.label}</span>
               </div>
             ))}
           </div>
@@ -375,46 +408,50 @@ export default function Landing() {
             <p className="text-slate-500">Choose a plan that fits your preparation needs.</p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-3xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
             {/* Free Plan */}
-            <div className="bg-white rounded-3xl p-8 border border-slate-200 shadow-sm">
+            <div className="bg-white rounded-[2rem] p-8 border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
               <h3 className="text-xl font-semibold text-slate-900 mb-2">Basic</h3>
               <div className="flex items-baseline gap-1 mb-6">
-                <span className="text-4xl font-bold text-slate-900">$0</span>
-                <span className="text-slate-500">/forever</span>
+                <span className="text-5xl font-bold text-slate-900 tracking-tight">$0</span>
+                <span className="text-slate-500 font-medium">/forever</span>
               </div>
               <p className="text-sm text-slate-500 mb-8 pb-8 border-b border-slate-100">Perfect for the occasional class presentation.</p>
-              <ul className="space-y-4 mb-8">
+              <ul className="space-y-4 mb-10">
                 {['Teleprompter access', 'Basic speech recognition', 'Session timer', 'Up to 3 minutes per session'].map((feature, i) => (
-                  <li key={i} className="flex items-center gap-3 text-sm text-slate-700">
-                    <CheckCircle2 className="w-5 h-5 text-blue-500 shrink-0" />
+                  <li key={i} className="flex items-center gap-3 text-sm text-slate-700 font-medium">
+                    <div className="w-5 h-5 rounded-full border-2 border-blue-100 flex items-center justify-center shrink-0">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-blue-500" />
+                    </div>
                     {feature}
                   </li>
                 ))}
               </ul>
-              <button onClick={() => navigate('/setup')} className="w-full py-3 rounded-xl bg-slate-100 text-slate-900 font-medium hover:bg-slate-200 transition-colors">
+              <button onClick={() => navigate('/setup')} className="w-full py-3.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 font-semibold hover:bg-slate-100 transition-colors shadow-sm">
                 Start for Free
               </button>
             </div>
 
             {/* Pro Plan */}
-            <div className="bg-blue-600 rounded-3xl p-8 border border-blue-600 shadow-xl shadow-blue-900/10 text-white relative overflow-hidden">
-              <div className="absolute top-0 right-0 bg-blue-500 text-xs font-bold px-3 py-1 rounded-bl-xl rounded-tr-2xl">RECOMMENDED</div>
+            <div className="bg-blue-600 rounded-[2rem] p-8 border border-blue-600 shadow-xl shadow-blue-900/10 text-white relative overflow-hidden flex flex-col">
+              <div className="absolute top-0 right-0 bg-blue-500/50 backdrop-blur-sm text-[10px] font-bold tracking-wider uppercase px-4 py-1.5 rounded-bl-2xl rounded-tr-[2rem]">RECOMMENDED</div>
               <h3 className="text-xl font-semibold mb-2">Pro</h3>
               <div className="flex items-baseline gap-1 mb-6">
-                <span className="text-4xl font-bold">$5</span>
-                <span className="text-blue-200">/month</span>
+                <span className="text-5xl font-bold tracking-tight">$5</span>
+                <span className="text-blue-200 font-medium">/month</span>
               </div>
-              <p className="text-sm text-blue-100 mb-8 pb-8 border-b border-blue-500">For serious students and job seekers.</p>
-              <ul className="space-y-4 mb-8">
+              <p className="text-sm text-blue-100 mb-8 pb-8 border-b border-blue-500/50">For serious students and job seekers.</p>
+              <ul className="space-y-4 mb-10 flex-1">
                 {['Everything in Basic', 'Live Eye Tracking', 'Filler word detection', 'Unlimited session length', 'Attempt comparison'].map((feature, i) => (
-                  <li key={i} className="flex items-center gap-3 text-sm text-blue-50">
-                    <CheckCircle2 className="w-5 h-5 text-blue-300 shrink-0" />
+                  <li key={i} className="flex items-center gap-3 text-sm text-white font-medium">
+                    <div className="w-5 h-5 rounded-full border-2 border-blue-400/50 flex items-center justify-center shrink-0">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-blue-200" />
+                    </div>
                     {feature}
                   </li>
                 ))}
               </ul>
-              <button onClick={() => navigate('/setup')} className="w-full py-3 rounded-xl bg-white text-blue-600 font-medium hover:bg-blue-50 transition-colors">
+              <button onClick={() => navigate('/setup')} className="w-full py-3.5 rounded-xl bg-white text-blue-600 font-semibold hover:bg-blue-50 transition-colors shadow-sm mt-auto">
                 Upgrade to Pro
               </button>
             </div>
