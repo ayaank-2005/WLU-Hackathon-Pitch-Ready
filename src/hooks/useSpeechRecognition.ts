@@ -1,6 +1,6 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 
-const FILLER_WORDS = ['um', 'uh', 'like', 'so', 'basically', 'literally', 'you know', 'actually'];
+const FILLER_WORDS = ['um', 'umm', 'uh', 'uhh', 'er', 'ah', 'hmm', 'like', 'so', 'basically', 'literally', 'you know', 'actually'];
 
 export function useSpeechRecognition() {
   const [isListening, setIsListening] = useState(false);
@@ -14,28 +14,20 @@ export function useSpeechRecognition() {
 
   const recognitionRef = useRef<any>(null);
   const startTimeRef = useRef<number>(0);
-  const wordTimestampsRef = useRef<number[]>([]);
   const wpmIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const isListeningRef = useRef(false);
   const processedIndicesRef = useRef<Set<number>>(new Set());
   const restartTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const finalWordCountRef = useRef(0);
+  const interimWordCountRef = useRef(0);
+  const wordCountHistoryRef = useRef<{ time: number; count: number }[]>([]);
+  const interimFillerRef = useRef<Set<string>>(new Set());
 
   const SpeechRecognitionAPI = typeof window !== 'undefined'
     ? (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition
     : null;
 
   const isSupported = !!SpeechRecognitionAPI;
-
-  const calculateWPM = useCallback(() => {
-    const now = Date.now();
-    const elapsed = now - startTimeRef.current;
-    if (elapsed < 2000) return 0;
-    const windowMs = Math.min(15000, elapsed);
-    const recentWords = wordTimestampsRef.current.filter(t => now - t < windowMs);
-    return recentWords.length > 0
-      ? Math.round((recentWords.length / windowMs) * 60000)
-      : 0;
-  }, []);
 
   const detectFillers = useCallback((text: string) => {
     const lower = text.toLowerCase();
@@ -46,7 +38,8 @@ export function useSpeechRecognition() {
       const regex = new RegExp(`\\b${filler}\\b`, 'gi');
       const matches = lower.match(regex);
       if (matches) {
-        found[filler] = matches.length;
+        const canonical = filler === 'umm' ? 'um' : filler === 'uhh' ? 'uh' : filler;
+        found[canonical] = (found[canonical] || 0) + matches.length;
         count += matches.length;
       }
     }
@@ -63,8 +56,11 @@ export function useSpeechRecognition() {
     setTotalFillers(0);
     setCurrentWPM(0);
     setWpmSamples([]);
-    wordTimestampsRef.current = [];
+    finalWordCountRef.current = 0;
+    interimWordCountRef.current = 0;
+    wordCountHistoryRef.current = [];
     processedIndicesRef.current = new Set();
+    interimFillerRef.current = new Set();
     startTimeRef.current = Date.now();
 
     const recognition = new SpeechRecognitionAPI();
@@ -94,12 +90,29 @@ export function useSpeechRecognition() {
         }
       }
 
+      // Count interim words for live WPM
+      const interimWords = interim.trim().split(/\s+/).filter((w: string) => w.length > 0);
+      interimWordCountRef.current = interimWords.length;
+
+      // Check interim text for fillers that Chrome often removes from final results
+      if (interim) {
+        const { found: interimFound } = detectFillers(interim);
+        for (const [word] of Object.entries(interimFound)) {
+          const key = `${word}_${Math.floor(Date.now() / 2000)}`;
+          if (!interimFillerRef.current.has(key)) {
+            interimFillerRef.current.add(key);
+            setFillerWords(prev => ({ ...prev, [word]: (prev[word] || 0) + interimFound[word] }));
+            setTotalFillers(prev => prev + interimFound[word]);
+          }
+        }
+      }
+
       if (newFinalText.trim()) {
         setTranscript(prev => prev + newFinalText);
 
         const newWords = newFinalText.trim().split(/\s+/).filter((w: string) => w.length > 0);
-        const now = Date.now();
-        newWords.forEach(() => wordTimestampsRef.current.push(now));
+        finalWordCountRef.current += newWords.length;
+        interimWordCountRef.current = 0;
         setWords(prev => [...prev, ...newWords]);
 
         const { found, count } = detectFillers(newFinalText);
@@ -150,13 +163,44 @@ export function useSpeechRecognition() {
     recognitionRef.current = recognition;
     try { recognition.start(); } catch { /* already started */ }
 
+    wordCountHistoryRef.current.push({ time: Date.now(), count: 0 });
+
     wpmIntervalRef.current = setInterval(() => {
-      const wpm = calculateWPM();
+      const now = Date.now();
+      const elapsed = now - startTimeRef.current;
+      const total = finalWordCountRef.current + interimWordCountRef.current;
+
+      wordCountHistoryRef.current.push({ time: now, count: total });
+
+      if (elapsed < 3000) {
+        setCurrentWPM(0);
+        return;
+      }
+
+      const windowMs = Math.min(15000, elapsed);
+      const cutoff = now - windowMs;
+
+      let baseCount = 0;
+      let baseTime = startTimeRef.current;
+      for (let i = wordCountHistoryRef.current.length - 1; i >= 0; i--) {
+        if (wordCountHistoryRef.current[i].time <= cutoff) {
+          baseCount = wordCountHistoryRef.current[i].count;
+          baseTime = wordCountHistoryRef.current[i].time;
+          break;
+        }
+      }
+
+      const timeDiff = now - baseTime;
+      if (timeDiff < 2000) return;
+
+      const wordDiff = total - baseCount;
+      const wpm = Math.round((wordDiff / timeDiff) * 60000);
+
       setCurrentWPM(wpm);
-      const elapsed = (Date.now() - startTimeRef.current) / 1000;
-      setWpmSamples(prev => [...prev, { time: elapsed, wpm }]);
-    }, 3000);
-  }, [SpeechRecognitionAPI, calculateWPM, detectFillers]);
+      const elapsedSec = elapsed / 1000;
+      setWpmSamples(prev => [...prev, { time: elapsedSec, wpm }]);
+    }, 2000);
+  }, [SpeechRecognitionAPI, detectFillers]);
 
   const stop = useCallback(() => {
     isListeningRef.current = false;
