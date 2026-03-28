@@ -1,0 +1,5 @@
+{
+  "name": "PresentSense",
+  "description": "A browser-based presentation rehearsal tool for students to improve eye contact, pacing, and filler words.",
+  "requestFramePermissions": []
+}
