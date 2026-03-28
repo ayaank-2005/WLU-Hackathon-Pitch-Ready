@@ -5,9 +5,11 @@ import {
 } from 'recharts';
 import {
   ArrowLeft, RotateCcw, Eye, Activity, MessageSquareWarning, Trophy,
-  TrendingUp, TrendingDown, Minus as MinusIcon, Lightbulb, Clock, FileText
+  TrendingUp, TrendingDown, Minus as MinusIcon, Lightbulb, Clock, FileText,
+  CheckCircle2, XCircle, MessageCircle, ChevronDown, ChevronUp
 } from 'lucide-react';
-import { useSession } from '../context/SessionContext';
+import { useSession, type InterviewResults } from '../context/SessionContext';
+import { useState } from 'react';
 
 function ScoreCircle({ score, label, color, size = 100 }: {
   score: number; label: string; color: string; size?: number;
@@ -61,9 +63,84 @@ function DeltaBadge({ current, previous, suffix = '', invert = false }: {
   );
 }
 
+function QuestionCard({ index, answer }: {
+  key?: string | number;
+  index: number;
+  answer: { question: string; answer: string; feedback?: string; followUp?: string; followUpAnswer?: string };
+}) {
+  const [expanded, setExpanded] = useState(false);
+  const isGood = answer.feedback && !answer.feedback.toLowerCase().includes('short') && !answer.feedback.toLowerCase().includes('elaborate') && !answer.feedback.toLowerCase().includes('improvement');
+
+  return (
+    <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+      <button
+        onClick={() => setExpanded(!expanded)}
+        className="w-full text-left p-5 flex items-start gap-4 hover:bg-slate-50/50 transition-colors"
+      >
+        <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 mt-0.5 ${
+          isGood ? 'bg-green-50 text-green-600' : 'bg-amber-50 text-amber-600'
+        }`}>
+          {isGood ? <CheckCircle2 className="w-4 h-4" /> : <XCircle className="w-4 h-4" />}
+        </div>
+        <div className="flex-1 min-w-0">
+          <div className="text-xs text-slate-400 font-medium mb-1">Question {index + 1}</div>
+          <p className="text-sm font-medium text-slate-900 leading-relaxed">{answer.question}</p>
+        </div>
+        {expanded ? (
+          <ChevronUp className="w-4 h-4 text-slate-400 shrink-0 mt-1" />
+        ) : (
+          <ChevronDown className="w-4 h-4 text-slate-400 shrink-0 mt-1" />
+        )}
+      </button>
+
+      {expanded && (
+        <motion.div
+          initial={{ height: 0, opacity: 0 }}
+          animate={{ height: 'auto', opacity: 1 }}
+          transition={{ duration: 0.2 }}
+          className="border-t border-slate-100"
+        >
+          <div className="p-5 space-y-4">
+            <div>
+              <div className="flex items-center gap-2 text-xs text-slate-400 font-medium mb-2">
+                <MessageCircle className="w-3 h-3" />
+                Your Answer
+              </div>
+              <div className="bg-slate-50 rounded-xl p-4 text-sm text-slate-700 leading-relaxed">
+                {answer.answer || <span className="text-slate-400 italic">No answer recorded</span>}
+              </div>
+            </div>
+
+            {answer.feedback && (
+              <div className={`rounded-xl p-4 text-sm leading-relaxed ${
+                isGood ? 'bg-green-50 text-green-700 border border-green-100' : 'bg-amber-50 text-amber-700 border border-amber-100'
+              }`}>
+                <span className="font-semibold">{isGood ? 'Strong:' : 'Improve:'}</span> {answer.feedback}
+              </div>
+            )}
+
+            {answer.followUp && (
+              <div>
+                <div className="text-xs text-indigo-500 font-medium mb-2">Follow-up Question</div>
+                <p className="text-sm text-slate-700 bg-indigo-50/50 rounded-xl p-4 border border-indigo-100">{answer.followUp}</p>
+                {answer.followUpAnswer && (
+                  <div className="mt-2 bg-slate-50 rounded-xl p-4 text-sm text-slate-700">
+                    <span className="text-xs text-slate-400 font-medium">Your follow-up answer: </span>
+                    {answer.followUpAnswer}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        </motion.div>
+      )}
+    </div>
+  );
+}
+
 export default function Report() {
   const navigate = useNavigate();
-  const { results, previousResults } = useSession();
+  const { results, previousResults, mode, interviewAnswers } = useSession();
 
   if (!results) {
     return (
@@ -71,7 +148,7 @@ export default function Report() {
         <div className="text-center">
           <p className="text-slate-500 mb-4">No session data found.</p>
           <button
-            onClick={() => navigate('/setup')}
+            onClick={() => navigate('/mode')}
             className="bg-blue-600 text-white px-6 py-3 rounded-full font-medium"
           >
             Start a Session
@@ -80,6 +157,10 @@ export default function Report() {
       </div>
     );
   }
+
+  const isInterview = mode === 'interview';
+  const interviewResults = isInterview ? (results as InterviewResults) : null;
+  const answers = isInterview ? (interviewResults?.interviewAnswers ?? interviewAnswers) : [];
 
   const formatDuration = (secs: number) =>
     `${Math.floor(secs / 60)}:${String(secs % 60).padStart(2, '0')}`;
@@ -95,6 +176,8 @@ export default function Report() {
     time: formatDuration(Math.round(s.time)),
     wpm: s.wpm,
   }));
+
+  const practiceAgainPath = isInterview ? '/interview/setup' : '/setup';
 
   return (
     <div className="min-h-screen bg-slate-50 font-sans">
@@ -115,7 +198,7 @@ export default function Report() {
             <span className="font-semibold text-lg tracking-tight">Pitch Ready.</span>
           </div>
           <button
-            onClick={() => navigate('/setup')}
+            onClick={() => navigate(practiceAgainPath)}
             className="flex items-center gap-2 text-blue-600 hover:text-blue-700 transition-colors text-sm font-medium"
           >
             <RotateCcw className="w-4 h-4" />
@@ -132,28 +215,44 @@ export default function Report() {
         >
           {/* Title */}
           <div className="text-center mb-10">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-green-50 border border-green-200 text-green-700 text-sm font-medium mb-4">
+            <div className={`inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-medium mb-4 ${
+              isInterview
+                ? 'bg-indigo-50 border border-indigo-200 text-indigo-700'
+                : 'bg-green-50 border border-green-200 text-green-700'
+            }`}>
               <Trophy className="w-4 h-4" />
-              Session Complete
+              {isInterview ? 'Interview Complete' : 'Session Complete'}
             </div>
             <h1 className="text-3xl md:text-4xl font-semibold text-slate-900 mb-2">
-              Your Rehearsal Report
+              {isInterview ? 'Your Interview Report' : 'Your Rehearsal Report'}
             </h1>
             <p className="text-slate-500 flex items-center justify-center gap-4">
               <span className="flex items-center gap-1"><Clock className="w-4 h-4" /> {formatDuration(results.duration)}</span>
               <span className="flex items-center gap-1"><FileText className="w-4 h-4" /> {results.transcript.split(/\s+/).filter(Boolean).length} words spoken</span>
+              {isInterview && <span className="flex items-center gap-1"><MessageCircle className="w-4 h-4" /> {answers.length} questions</span>}
             </p>
           </div>
 
           {/* Score Cards */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-10">
+          <div className={`grid gap-6 mb-10 ${isInterview ? 'grid-cols-2 md:grid-cols-5' : 'grid-cols-2 md:grid-cols-4'}`}>
+            {isInterview && interviewResults && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.05 }}
+                className="bg-white rounded-2xl border border-indigo-200 shadow-sm p-6 flex flex-col items-center"
+              >
+                <ScoreCircle score={interviewResults.interviewScore} label="Interview" color={scoreColor(interviewResults.interviewScore)} />
+              </motion.div>
+            )}
+
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
               className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 flex flex-col items-center"
             >
-              <ScoreCircle score={results.overallScore} label="Overall" color={scoreColor(results.overallScore)} />
+              <ScoreCircle score={results.overallScore} label="Delivery" color={scoreColor(results.overallScore)} />
               {previousResults && (
                 <div className="mt-3">
                   <DeltaBadge current={results.overallScore} previous={previousResults.overallScore} suffix="pts" />
@@ -210,6 +309,21 @@ export default function Report() {
               )}
             </motion.div>
           </div>
+
+          {/* Interview Q&A Breakdown */}
+          {isInterview && answers.length > 0 && (
+            <div className="mb-10">
+              <h3 className="text-sm font-semibold text-slate-700 mb-4 flex items-center gap-2">
+                <MessageCircle className="w-4 h-4 text-indigo-500" />
+                Question-by-Question Breakdown
+              </h3>
+              <div className="space-y-3">
+                {answers.map((answer, i) => (
+                  <QuestionCard key={i} index={i} answer={answer} />
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Charts & Details */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
@@ -307,8 +421,8 @@ export default function Report() {
             </div>
           </div>
 
-          {/* Transcript */}
-          {results.transcript.trim() && (
+          {/* Transcript (presentation mode only) */}
+          {!isInterview && results.transcript.trim() && (
             <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 mb-10">
               <h3 className="text-sm font-semibold text-slate-700 mb-4 flex items-center gap-2">
                 <FileText className="w-4 h-4 text-slate-400" />
@@ -353,7 +467,7 @@ export default function Report() {
           {/* CTA */}
           <div className="text-center pb-10">
             <button
-              onClick={() => navigate('/setup')}
+              onClick={() => navigate(practiceAgainPath)}
               className="bg-blue-600 hover:bg-blue-700 text-white px-10 py-4 rounded-full text-lg font-medium transition-all shadow-lg shadow-blue-900/20 hover:shadow-xl hover:-translate-y-0.5 inline-flex items-center gap-2"
             >
               <RotateCcw className="w-5 h-5" />

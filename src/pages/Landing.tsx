@@ -47,7 +47,7 @@ export default function Landing() {
               Log in
             </button>
             <button
-              onClick={() => navigate('/setup')}
+              onClick={() => navigate('/mode')}
               className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-full text-sm font-medium transition-all shadow-sm hover:shadow-md"
             >
               Start for Free
@@ -84,7 +84,7 @@ export default function Landing() {
             {/* CTAs */}
             <div className="flex flex-col sm:flex-row items-center gap-4">
               <button
-                onClick={() => navigate('/setup')}
+                onClick={() => navigate('/mode')}
                 className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white px-8 py-3.5 rounded-full text-base font-medium transition-all shadow-lg shadow-blue-600/20 hover:shadow-xl hover:-translate-y-0.5"
               >
                 Start for Free
@@ -337,8 +337,19 @@ export default function Landing() {
       </section>
 
       {/* Success at a glance (Grid) */}
-      <section id="benefits" className="py-24 bg-white">
-        <div className="max-w-6xl mx-auto px-6">
+      <section id="benefits" className="relative py-24 overflow-hidden">
+        {/* Soft Cloud Background — matches hero lightness */}
+        <div 
+          className="absolute inset-0 z-0"
+          style={{
+            backgroundImage: "url('https://images.unsplash.com/photo-1509803874385-db7c23652552?q=80&w=2070&auto=format&fit=crop')",
+            backgroundSize: "cover",
+            backgroundPosition: "center top",
+          }}
+        >
+          <div className="absolute inset-0 bg-gradient-to-b from-white/90 via-white/70 to-white/90"></div>
+        </div>
+        <div className="relative z-10 max-w-6xl mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-medium text-slate-900 mb-4 tracking-tight">Success at a glance</h2>
             <p className="text-slate-500">With our powerful real-time analytics, you can focus on what truly matters for your delivery.</p>
@@ -355,7 +366,7 @@ export default function Landing() {
               { icon: FileText, title: "Custom Scripts", desc: "Paste your own notes or use our built-in templates for pitches and interviews." },
               { icon: CheckCircle2, title: "Progress Tracking", desc: "Compare your current attempt against your previous ones to see growth." }
             ].map((feature, i) => (
-              <div key={i} className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm hover:shadow-md hover:border-blue-200 transition-all group">
+              <div key={i} className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 border border-slate-200/80 shadow-sm hover:shadow-md hover:border-blue-200 transition-all group">
                 <div className="w-12 h-12 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center mb-5 group-hover:bg-blue-600 group-hover:border-blue-600 transition-colors">
                   <feature.icon className="w-6 h-6 text-slate-600 group-hover:text-white transition-colors" />
                 </div>
@@ -400,142 +411,144 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* Pricing */}
-      <section id="pricing" className="py-24 bg-slate-50 border-y border-slate-200/60">
-        <div className="max-w-5xl mx-auto px-6">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-medium text-slate-900 mb-4 tracking-tight">Simple, Student-Friendly Pricing</h2>
-            <p className="text-slate-500">Choose a plan that fits your preparation needs.</p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
-            {/* Free Plan */}
-            <div className="bg-white rounded-[2rem] p-8 border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
-              <h3 className="text-xl font-semibold text-slate-900 mb-2">Basic</h3>
-              <div className="flex items-baseline gap-1 mb-6">
-                <span className="text-5xl font-bold text-slate-900 tracking-tight">$0</span>
-                <span className="text-slate-500 font-medium">/forever</span>
-              </div>
-              <p className="text-sm text-slate-500 mb-8 pb-8 border-b border-slate-100">Perfect for the occasional class presentation.</p>
-              <ul className="space-y-4 mb-10">
-                {['Teleprompter access', 'Basic speech recognition', 'Session timer', 'Up to 3 minutes per session'].map((feature, i) => (
-                  <li key={i} className="flex items-center gap-3 text-sm text-slate-700 font-medium">
-                    <div className="w-5 h-5 rounded-full border-2 border-blue-100 flex items-center justify-center shrink-0">
-                      <CheckCircle2 className="w-3.5 h-3.5 text-blue-500" />
-                    </div>
-                    {feature}
-                  </li>
-                ))}
-              </ul>
-              <button onClick={() => navigate('/setup')} className="w-full py-3.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 font-semibold hover:bg-slate-100 transition-colors shadow-sm">
-                Start for Free
-              </button>
-            </div>
-
-            {/* Pro Plan */}
-            <div className="bg-blue-600 rounded-[2rem] p-8 border border-blue-600 shadow-xl shadow-blue-900/10 text-white relative overflow-hidden flex flex-col">
-              <div className="absolute top-0 right-0 bg-blue-500/50 backdrop-blur-sm text-[10px] font-bold tracking-wider uppercase px-4 py-1.5 rounded-bl-2xl rounded-tr-[2rem]">RECOMMENDED</div>
-              <h3 className="text-xl font-semibold mb-2">Pro</h3>
-              <div className="flex items-baseline gap-1 mb-6">
-                <span className="text-5xl font-bold tracking-tight">$5</span>
-                <span className="text-blue-200 font-medium">/month</span>
-              </div>
-              <p className="text-sm text-blue-100 mb-8 pb-8 border-b border-blue-500/50">For serious students and job seekers.</p>
-              <ul className="space-y-4 mb-10 flex-1">
-                {['Everything in Basic', 'Live Eye Tracking', 'Filler word detection', 'Unlimited session length', 'Attempt comparison'].map((feature, i) => (
-                  <li key={i} className="flex items-center gap-3 text-sm text-white font-medium">
-                    <div className="w-5 h-5 rounded-full border-2 border-blue-400/50 flex items-center justify-center shrink-0">
-                      <CheckCircle2 className="w-3.5 h-3.5 text-blue-200" />
-                    </div>
-                    {feature}
-                  </li>
-                ))}
-              </ul>
-              <button onClick={() => navigate('/setup')} className="w-full py-3.5 rounded-xl bg-white text-blue-600 font-semibold hover:bg-blue-50 transition-colors shadow-sm mt-auto">
-                Upgrade to Pro
-              </button>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Bottom CTA */}
-      <section className="relative py-32 overflow-hidden">
-        {/* Soft Cloud Background */}
+      {/* Pricing + CTA + Footer — one continuous cloud section */}
+      <div className="relative overflow-hidden">
         <div 
           className="absolute inset-0 z-0"
           style={{
             backgroundImage: "url('https://images.unsplash.com/photo-1509803874385-db7c23652552?q=80&w=2070&auto=format&fit=crop')",
             backgroundSize: "cover",
-            backgroundPosition: "center bottom",
+            backgroundPosition: "center",
           }}
         >
-          {/* Overlay to soften the clouds and fade smoothly from the white page above */}
-          <div className="absolute inset-0 bg-gradient-to-t from-white/40 via-white/80 to-white"></div>
+          <div className="absolute inset-0 bg-gradient-to-b from-white via-white/60 to-white/50"></div>
         </div>
-        <div className="relative z-10 max-w-3xl mx-auto px-6 text-center">
-          <h2 className="text-4xl md:text-5xl font-medium text-slate-900 mb-6 tracking-tight">Ready to ace your next pitch or interview?</h2>
-          <p className="text-lg text-slate-600 mb-10">Join thousands of students who practice smarter, not harder.</p>
-          <button
-            onClick={() => navigate('/setup')}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-10 py-4 rounded-full text-lg font-medium transition-all shadow-lg shadow-blue-600/20 hover:shadow-xl hover:-translate-y-0.5"
-          >
-            Start Practicing Now
-          </button>
-        </div>
-      </section>
 
-      {/* Footer */}
-      <footer className="bg-white text-slate-500 py-16 border-t border-slate-100">
-        <div className="max-w-6xl mx-auto px-6">
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8 mb-12">
-            <div className="max-w-xs">
-              <div className="flex items-center gap-2 mb-4">
-                <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold text-sm shadow-sm">
-                  P
+        {/* Pricing */}
+        <section id="pricing" className="relative z-10 py-24">
+          <div className="max-w-5xl mx-auto px-6">
+            <div className="text-center mb-16">
+              <h2 className="text-3xl md:text-4xl font-medium text-slate-900 mb-4 tracking-tight">Simple, Student-Friendly Pricing</h2>
+              <p className="text-slate-600">Choose a plan that fits your preparation needs.</p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+              {/* Free Plan */}
+              <div className="bg-white/80 backdrop-blur-xl rounded-[2rem] p-8 border border-white shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] transition-all">
+                <h3 className="text-xl font-semibold text-slate-900 mb-2">Basic</h3>
+                <div className="flex items-baseline gap-1 mb-6">
+                  <span className="text-5xl font-bold text-slate-900 tracking-tight">$0</span>
+                  <span className="text-slate-500 font-medium">/forever</span>
                 </div>
-                <span className="text-slate-900 font-semibold text-lg tracking-tight">Pitch Ready.</span>
+                <p className="text-sm text-slate-500 mb-8 pb-8 border-b border-slate-200/60">Perfect for the occasional class presentation.</p>
+                <ul className="space-y-4 mb-10">
+                  {['Teleprompter access', 'Basic speech recognition', 'Session timer', 'Up to 3 minutes per session'].map((feature, i) => (
+                    <li key={i} className="flex items-center gap-3 text-sm text-slate-700 font-medium">
+                      <div className="w-5 h-5 rounded-full border-2 border-blue-100 flex items-center justify-center shrink-0 bg-white">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-blue-500" />
+                      </div>
+                      {feature}
+                    </li>
+                  ))}
+                </ul>
+                <button onClick={() => navigate('/mode')} className="w-full py-3.5 rounded-xl bg-white border border-slate-200 text-slate-900 font-semibold hover:bg-slate-50 transition-colors shadow-sm">
+                  Start for Free
+                </button>
               </div>
-              <p className="text-sm text-slate-500 leading-relaxed">
-                Bring your script, webcam, and AI-powered feedback into one rehearsal workspace.
-              </p>
+
+              {/* Pro Plan */}
+              <div className="bg-blue-600/95 backdrop-blur-xl rounded-[2rem] p-8 border border-blue-500 shadow-xl shadow-blue-900/20 text-white relative overflow-hidden flex flex-col">
+                <div className="absolute top-0 right-0 bg-blue-500/50 backdrop-blur-sm text-[10px] font-bold tracking-wider uppercase px-4 py-1.5 rounded-bl-2xl rounded-tr-[2rem] border-b border-l border-blue-400/30">RECOMMENDED</div>
+                <h3 className="text-xl font-semibold mb-2">Pro</h3>
+                <div className="flex items-baseline gap-1 mb-6">
+                  <span className="text-5xl font-bold tracking-tight">$5</span>
+                  <span className="text-blue-200 font-medium">/month</span>
+                </div>
+                <p className="text-sm text-blue-100 mb-8 pb-8 border-b border-blue-500/50">For serious students and job seekers.</p>
+                <ul className="space-y-4 mb-10 flex-1">
+                  {['Everything in Basic', 'Live Eye Tracking', 'Filler word detection', 'Unlimited session length', 'Attempt comparison'].map((feature, i) => (
+                    <li key={i} className="flex items-center gap-3 text-sm text-white font-medium">
+                      <div className="w-5 h-5 rounded-full border-2 border-blue-400/50 flex items-center justify-center shrink-0 bg-blue-500/20">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-blue-200" />
+                      </div>
+                      {feature}
+                    </li>
+                  ))}
+                </ul>
+                <button onClick={() => navigate('/mode')} className="w-full py-3.5 rounded-xl bg-white text-blue-600 font-semibold hover:bg-blue-50 transition-colors shadow-sm mt-auto">
+                  Upgrade to Pro
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Bottom CTA */}
+        <section className="relative z-10 py-32">
+          <div className="max-w-3xl mx-auto px-6 text-center">
+            <h2 className="text-4xl md:text-5xl font-medium text-slate-900 mb-6 tracking-tight">Ready to ace your next pitch or interview?</h2>
+            <p className="text-lg text-slate-600 mb-10">Join thousands of students who practice smarter, not harder.</p>
+            <button
+              onClick={() => navigate('/mode')}
+              className="bg-blue-600 hover:bg-blue-700 text-white px-10 py-4 rounded-full text-lg font-medium transition-all shadow-lg shadow-blue-600/20 hover:shadow-xl hover:-translate-y-0.5"
+            >
+              Start Practicing Now
+            </button>
+          </div>
+        </section>
+
+        {/* Footer */}
+        <footer className="relative z-10 text-slate-500 py-16 border-t border-white/30">
+          <div className="max-w-6xl mx-auto px-6">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8 mb-12">
+              <div className="max-w-xs">
+                <div className="flex items-center gap-2 mb-4">
+                  <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold text-sm shadow-sm">
+                    P
+                  </div>
+                  <span className="text-slate-900 font-semibold text-lg tracking-tight">Pitch Ready.</span>
+                </div>
+                <p className="text-sm text-slate-500 leading-relaxed">
+                  Bring your script, webcam, and AI-powered feedback into one rehearsal workspace.
+                </p>
+              </div>
+              
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-8 md:gap-16 text-sm">
+                <div>
+                  <h4 className="font-semibold text-slate-900 mb-4">Product</h4>
+                  <ul className="space-y-3">
+                    <li><a href="#" className="hover:text-blue-600 transition-colors">Features</a></li>
+                    <li><a href="#" className="hover:text-blue-600 transition-colors">Pricing</a></li>
+                    <li><a href="#" className="hover:text-blue-600 transition-colors">Use Cases</a></li>
+                  </ul>
+                </div>
+                <div>
+                  <h4 className="font-semibold text-slate-900 mb-4">Resources</h4>
+                  <ul className="space-y-3">
+                    <li><a href="#" className="hover:text-blue-600 transition-colors">Interview Tips</a></li>
+                    <li><a href="#" className="hover:text-blue-600 transition-colors">Pitch Templates</a></li>
+                    <li><a href="#" className="hover:text-blue-600 transition-colors">Blog</a></li>
+                  </ul>
+                </div>
+                <div>
+                  <h4 className="font-semibold text-slate-900 mb-4">Company</h4>
+                  <ul className="space-y-3">
+                    <li><a href="#" className="hover:text-blue-600 transition-colors">About Us</a></li>
+                    <li><a href="#" className="hover:text-blue-600 transition-colors">Contact</a></li>
+                    <li><a href="#" className="hover:text-blue-600 transition-colors">Privacy Policy</a></li>
+                  </ul>
+                </div>
+              </div>
             </div>
             
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-8 md:gap-16 text-sm">
-              <div>
-                <h4 className="font-semibold text-slate-900 mb-4">Product</h4>
-                <ul className="space-y-3">
-                  <li><a href="#" className="hover:text-blue-600 transition-colors">Features</a></li>
-                  <li><a href="#" className="hover:text-blue-600 transition-colors">Pricing</a></li>
-                  <li><a href="#" className="hover:text-blue-600 transition-colors">Use Cases</a></li>
-                </ul>
-              </div>
-              <div>
-                <h4 className="font-semibold text-slate-900 mb-4">Resources</h4>
-                <ul className="space-y-3">
-                  <li><a href="#" className="hover:text-blue-600 transition-colors">Interview Tips</a></li>
-                  <li><a href="#" className="hover:text-blue-600 transition-colors">Pitch Templates</a></li>
-                  <li><a href="#" className="hover:text-blue-600 transition-colors">Blog</a></li>
-                </ul>
-              </div>
-              <div>
-                <h4 className="font-semibold text-slate-900 mb-4">Company</h4>
-                <ul className="space-y-3">
-                  <li><a href="#" className="hover:text-blue-600 transition-colors">About Us</a></li>
-                  <li><a href="#" className="hover:text-blue-600 transition-colors">Contact</a></li>
-                  <li><a href="#" className="hover:text-blue-600 transition-colors">Privacy Policy</a></li>
-                </ul>
+            <div className="pt-8 border-t border-white/30 flex flex-col md:flex-row justify-between items-center gap-4 text-xs font-medium">
+              <div className="flex items-center gap-1">
+                &copy; {new Date().getFullYear()} Pitch Ready. Built for the WLU Hackathon.
               </div>
             </div>
           </div>
-          
-          <div className="pt-8 border-t border-slate-100 flex flex-col md:flex-row justify-between items-center gap-4 text-xs font-medium">
-            <div className="flex items-center gap-1">
-              &copy; {new Date().getFullYear()} Pitch Ready. Built for the WLU Hackathon.
-            </div>
-          </div>
-        </div>
-      </footer>
+        </footer>
+      </div>
     </div>
   );
 }

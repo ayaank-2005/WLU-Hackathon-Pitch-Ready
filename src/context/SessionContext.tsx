@@ -21,15 +21,63 @@ export interface SessionResults {
   hasEyeTracking: boolean;
 }
 
+export type AppMode = 'presentation' | 'interview';
+
+export type RoleType =
+  | 'software_engineering'
+  | 'product_management'
+  | 'marketing'
+  | 'finance'
+  | 'consulting'
+  | 'data_science'
+  | 'design'
+  | 'general';
+
+export interface InterviewConfig {
+  jobTitle: string;
+  company: string;
+  roleType: RoleType;
+  jobDescription: string;
+  questionCount: number;
+  apiKey?: string;
+}
+
+export interface InterviewAnswer {
+  question: string;
+  answer: string;
+  feedback?: string;
+  followUp?: string;
+  followUpAnswer?: string;
+}
+
+export interface InterviewResults extends SessionResults {
+  interviewAnswers: InterviewAnswer[];
+  interviewScore: number;
+}
+
 interface SessionContextType {
+  mode: AppMode;
+  setMode: (mode: AppMode) => void;
+
+  // Presentation mode
   script: string;
   setScript: (script: string) => void;
   fontSize: number;
   setFontSize: (size: number) => void;
   scrollSpeed: number;
   setScrollSpeed: (speed: number) => void;
+
+  // Interview mode
+  interviewConfig: InterviewConfig | null;
+  setInterviewConfig: (config: InterviewConfig) => void;
+  interviewQuestions: string[];
+  setInterviewQuestions: (questions: string[]) => void;
+  interviewAnswers: InterviewAnswer[];
+  setInterviewAnswers: (answers: InterviewAnswer[]) => void;
+
+  // Shared results
   results: SessionResults | null;
-  setResults: (results: SessionResults) => void;
+  setResults: (results: SessionResults | InterviewResults) => void;
   previousResults: SessionResults | null;
   clearResults: () => void;
 }
@@ -39,9 +87,15 @@ const SessionContext = createContext<SessionContextType | null>(null);
 const STORAGE_KEY = 'pitchready_prev_results';
 
 export function SessionProvider({ children }: { children: ReactNode }) {
+  const [mode, setMode] = useState<AppMode>('presentation');
   const [script, setScript] = useState('');
   const [fontSize, setFontSize] = useState(32);
   const [scrollSpeed, setScrollSpeed] = useState(2);
+
+  const [interviewConfig, setInterviewConfig] = useState<InterviewConfig | null>(null);
+  const [interviewQuestions, setInterviewQuestions] = useState<string[]>([]);
+  const [interviewAnswers, setInterviewAnswers] = useState<InterviewAnswer[]>([]);
+
   const [results, setResultsState] = useState<SessionResults | null>(null);
   const [previousResults, setPreviousResults] = useState<SessionResults | null>(() => {
     try {
@@ -52,7 +106,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
     }
   });
 
-  const setResults = useCallback((newResults: SessionResults) => {
+  const setResults = useCallback((newResults: SessionResults | InterviewResults) => {
     if (results) {
       try {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(results));
@@ -68,9 +122,13 @@ export function SessionProvider({ children }: { children: ReactNode }) {
 
   return (
     <SessionContext.Provider value={{
+      mode, setMode,
       script, setScript,
       fontSize, setFontSize,
       scrollSpeed, setScrollSpeed,
+      interviewConfig, setInterviewConfig,
+      interviewQuestions, setInterviewQuestions,
+      interviewAnswers, setInterviewAnswers,
       results, setResults,
       previousResults,
       clearResults,
