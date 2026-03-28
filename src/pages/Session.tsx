@@ -33,6 +33,7 @@ export default function Session() {
   const scrollAnimRef = useRef<number | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const isPausedRef = useRef(false);
+  const scrollAccumRef = useRef(0);
 
   useEffect(() => {
     if (!session.script) navigate('/setup');
@@ -58,12 +59,21 @@ export default function Session() {
   };
 
   const startAutoScroll = useCallback(() => {
-    const speeds = [0.25, 0.5, 0.9];
-    const speed = speeds[(session.scrollSpeed || 2) - 1] || 0.5;
+    if (scrollAnimRef.current) {
+      cancelAnimationFrame(scrollAnimRef.current);
+    }
+    scrollAccumRef.current = 0;
+
+    const pxPerFrame = [0.4, 0.8, 1.5][(session.scrollSpeed || 2) - 1] || 0.8;
 
     const scroll = () => {
       if (teleprompterRef.current && !isPausedRef.current) {
-        teleprompterRef.current.scrollTop += speed;
+        scrollAccumRef.current += pxPerFrame;
+        if (scrollAccumRef.current >= 1) {
+          const whole = Math.floor(scrollAccumRef.current);
+          teleprompterRef.current.scrollTop += whole;
+          scrollAccumRef.current -= whole;
+        }
       }
       scrollAnimRef.current = requestAnimationFrame(scroll);
     };
@@ -130,6 +140,13 @@ export default function Session() {
     }
 
     startAutoScroll();
+
+    return () => {
+      if (scrollAnimRef.current) {
+        cancelAnimationFrame(scrollAnimRef.current);
+        scrollAnimRef.current = null;
+      }
+    };
   }, [phase]);
 
   useEffect(() => {
