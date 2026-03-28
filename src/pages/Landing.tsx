@@ -349,18 +349,18 @@ export default function Landing() {
           <h2 className="text-3xl md:text-4xl font-medium text-slate-900 mb-6 tracking-tight">Practice for any high-stakes moment.</h2>
           <p className="text-lg text-slate-500 mb-16">Whether it's a grade, a job offer, or funding on the line — be ready.</p>
           
-          <div className="flex flex-wrap justify-center gap-6 md:gap-12">
+          <div className="flex flex-wrap justify-center gap-8 md:gap-20">
             {[
               { icon: GraduationCap, label: "Class Presentations", color: "bg-purple-100 text-purple-600" },
               { icon: Briefcase, label: "Job & Co-op Interviews", color: "bg-blue-100 text-blue-600" },
               { icon: Users, label: "Startup Pitches", color: "bg-emerald-100 text-emerald-600" },
               { icon: Video, label: "Thesis & Case Defenses", color: "bg-rose-100 text-rose-600" }
             ].map((item, i) => (
-              <div key={i} className="flex flex-col items-center gap-3">
-                <div className={`w-16 h-16 rounded-2xl flex items-center justify-center ${item.color} shadow-sm`}>
+              <div key={i} className="flex flex-col items-center gap-4">
+                <div className={`w-20 h-20 rounded-[1.5rem] flex items-center justify-center ${item.color} shadow-sm`}>
                   <item.icon className="w-8 h-8" />
                 </div>
-                <span className="font-medium text-slate-700">{item.label}</span>
+                <span className="font-medium text-slate-700 text-sm">{item.label}</span>
               </div>
             ))}
           </div>
