@@ -14,12 +14,17 @@ export default function Landing() {
       
       {/* --- HERO SECTION --- */}
       <div className="relative overflow-hidden pt-4 pb-32 lg:pb-48">
-        {/* Smooth Sky Background */}
-        <div className="absolute inset-0 z-0 bg-[#e0f2fe]">
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,_var(--tw-gradient-stops))] from-[#bae6fd] via-[#e0f2fe] to-white opacity-80"></div>
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-[#7dd3fc] via-transparent to-transparent opacity-40"></div>
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-white rounded-full blur-[120px] opacity-60"></div>
-          <div className="absolute bottom-0 left-0 right-0 h-64 bg-gradient-to-t from-white to-transparent"></div>
+        {/* Soft Cloud Background */}
+        <div 
+          className="absolute inset-0 z-0"
+          style={{
+            backgroundImage: "url('https://images.unsplash.com/photo-1509803874385-db7c23652552?q=80&w=2070&auto=format&fit=crop')",
+            backgroundSize: "cover",
+            backgroundPosition: "center top",
+          }}
+        >
+          {/* Overlay to soften the clouds and fade smoothly into the white page below */}
+          <div className="absolute inset-0 bg-gradient-to-b from-white/20 via-white/60 to-white"></div>
         </div>
 
         {/* Header */}
@@ -399,8 +404,17 @@ export default function Landing() {
 
       {/* Bottom CTA */}
       <section className="relative py-32 overflow-hidden">
-        <div className="absolute inset-0 bg-[#e0f2fe]">
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-[#bae6fd] via-[#e0f2fe] to-[#e0f2fe] opacity-80"></div>
+        {/* Soft Cloud Background */}
+        <div 
+          className="absolute inset-0 z-0"
+          style={{
+            backgroundImage: "url('https://images.unsplash.com/photo-1509803874385-db7c23652552?q=80&w=2070&auto=format&fit=crop')",
+            backgroundSize: "cover",
+            backgroundPosition: "center bottom",
+          }}
+        >
+          {/* Overlay to soften the clouds and fade smoothly from the white page above */}
+          <div className="absolute inset-0 bg-gradient-to-t from-white/40 via-white/80 to-white"></div>
         </div>
         <div className="relative z-10 max-w-3xl mx-auto px-6 text-center">
           <h2 className="text-4xl md:text-5xl font-medium text-slate-900 mb-6 tracking-tight">Ready to ace your next pitch?</h2>
