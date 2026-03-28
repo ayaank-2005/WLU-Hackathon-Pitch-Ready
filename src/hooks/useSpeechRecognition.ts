@@ -14,28 +14,18 @@ export function useSpeechRecognition() {
 
   const recognitionRef = useRef<any>(null);
   const startTimeRef = useRef<number>(0);
-  const wordTimestampsRef = useRef<number[]>([]);
   const wpmIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const isListeningRef = useRef(false);
   const processedIndicesRef = useRef<Set<number>>(new Set());
   const restartTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const wordCountRef = useRef(0);
+  const wordCountHistoryRef = useRef<{ time: number; count: number }[]>([]);
 
   const SpeechRecognitionAPI = typeof window !== 'undefined'
     ? (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition
     : null;
 
   const isSupported = !!SpeechRecognitionAPI;
-
-  const calculateWPM = useCallback(() => {
-    const now = Date.now();
-    const elapsed = now - startTimeRef.current;
-    if (elapsed < 2000) return 0;
-    const windowMs = Math.min(15000, elapsed);
-    const recentWords = wordTimestampsRef.current.filter(t => now - t < windowMs);
-    return recentWords.length > 0
-      ? Math.round((recentWords.length / windowMs) * 60000)
-      : 0;
-  }, []);
 
   const detectFillers = useCallback((text: string) => {
     const lower = text.toLowerCase();
@@ -63,7 +53,8 @@ export function useSpeechRecognition() {
     setTotalFillers(0);
     setCurrentWPM(0);
     setWpmSamples([]);
-    wordTimestampsRef.current = [];
+    wordCountRef.current = 0;
+    wordCountHistoryRef.current = [];
     processedIndicesRef.current = new Set();
     startTimeRef.current = Date.now();
 
@@ -98,8 +89,7 @@ export function useSpeechRecognition() {
         setTranscript(prev => prev + newFinalText);
 
         const newWords = newFinalText.trim().split(/\s+/).filter((w: string) => w.length > 0);
-        const now = Date.now();
-        newWords.forEach(() => wordTimestampsRef.current.push(now));
+        wordCountRef.current += newWords.length;
         setWords(prev => [...prev, ...newWords]);
 
         const { found, count } = detectFillers(newFinalText);
@@ -150,13 +140,48 @@ export function useSpeechRecognition() {
     recognitionRef.current = recognition;
     try { recognition.start(); } catch { /* already started */ }
 
+    wordCountHistoryRef.current.push({ time: Date.now(), count: 0 });
+
     wpmIntervalRef.current = setInterval(() => {
-      const wpm = calculateWPM();
+      const now = Date.now();
+      const elapsed = now - startTimeRef.current;
+      const total = wordCountRef.current;
+
+      wordCountHistoryRef.current.push({ time: now, count: total });
+
+      if (elapsed < 3000) {
+        setCurrentWPM(0);
+        return;
+      }
+
+      const history = wordCountHistoryRef.current;
+
+      // Use a 15-second sliding window, or full elapsed if < 15s
+      const windowMs = Math.min(15000, elapsed);
+      const cutoff = now - windowMs;
+
+      // Find the snapshot closest to the window start
+      let baseCount = 0;
+      let baseTime = startTimeRef.current;
+      for (let i = history.length - 1; i >= 0; i--) {
+        if (history[i].time <= cutoff) {
+          baseCount = history[i].count;
+          baseTime = history[i].time;
+          break;
+        }
+      }
+
+      const timeDiff = now - baseTime;
+      if (timeDiff < 2000) return;
+
+      const wordDiff = total - baseCount;
+      const wpm = Math.round((wordDiff / timeDiff) * 60000);
+
       setCurrentWPM(wpm);
-      const elapsed = (Date.now() - startTimeRef.current) / 1000;
-      setWpmSamples(prev => [...prev, { time: elapsed, wpm }]);
-    }, 3000);
-  }, [SpeechRecognitionAPI, calculateWPM, detectFillers]);
+      const elapsedSec = elapsed / 1000;
+      setWpmSamples(prev => [...prev, { time: elapsedSec, wpm }]);
+    }, 2000);
+  }, [SpeechRecognitionAPI, detectFillers]);
 
   const stop = useCallback(() => {
     isListeningRef.current = false;

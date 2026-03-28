@@ -446,7 +446,7 @@ export default function Report() {
           </div>
 
           {/* AI Tips */}
-          {(aiLoading || aiTips) && (
+          {!isInterview && (
             <div className="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-2xl border border-indigo-200/60 shadow-sm p-6 mb-6">
               <h3 className="text-sm font-semibold text-indigo-700 mb-4 flex items-center gap-2">
                 <Sparkles className="w-4 h-4 text-indigo-500" />
@@ -457,7 +457,7 @@ export default function Report() {
                   <div className="w-5 h-5 border-2 border-indigo-300 border-t-indigo-600 rounded-full animate-spin" />
                   <span className="text-sm text-indigo-500">Analyzing your presentation...</span>
                 </div>
-              ) : aiTips && (
+              ) : aiTips ? (
                 <div className="space-y-4">
                   {aiTips.map((tip, i) => (
                     <div key={i} className="flex gap-3">
@@ -468,7 +468,23 @@ export default function Report() {
                     </div>
                   ))}
                 </div>
-              )}
+              ) : aiError ? (
+                <p className="text-sm text-red-500 py-2">
+                  AI analysis failed. Check that your Gemini API key is valid.{' '}
+                  <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener noreferrer" className="underline">
+                    Get a free key
+                  </a>
+                </p>
+              ) : !apiKey ? (
+                <p className="text-sm text-slate-500 py-2">
+                  Add a free Gemini API key in{' '}
+                  <button onClick={() => navigate('/setup')} className="text-indigo-600 underline font-medium">Setup</button>
+                  {' '}to get AI-powered feedback on your delivery.{' '}
+                  <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener noreferrer" className="text-indigo-600 underline">
+                    Get a free key
+                  </a>
+                </p>
+              ) : null}
             </div>
           )}
 
