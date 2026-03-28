@@ -401,7 +401,7 @@ export default function Landing() {
       </section>
 
       {/* Pricing */}
-      <section id="pricing" className="py-24 bg-white">
+      <section id="pricing" className="py-24 bg-slate-50 border-y border-slate-200/60">
         <div className="max-w-5xl mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-medium text-slate-900 mb-4 tracking-tight">Simple, Student-Friendly Pricing</h2>
@@ -486,23 +486,53 @@ export default function Landing() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-white text-slate-500 py-12 border-t border-slate-100">
-        <div className="max-w-6xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-6">
-          <div className="flex items-center gap-2">
-            <div className="w-6 h-6 bg-blue-600 rounded flex items-center justify-center text-white font-bold text-xs">
-              P
+      <footer className="bg-white text-slate-500 py-16 border-t border-slate-100">
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8 mb-12">
+            <div className="max-w-xs">
+              <div className="flex items-center gap-2 mb-4">
+                <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold text-sm shadow-sm">
+                  P
+                </div>
+                <span className="text-slate-900 font-semibold text-lg tracking-tight">Pitch Ready.</span>
+              </div>
+              <p className="text-sm text-slate-500 leading-relaxed">
+                Bring your script, webcam, and AI-powered feedback into one rehearsal workspace.
+              </p>
             </div>
-            <span className="text-slate-900 font-semibold">Pitch Ready</span>
+            
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-8 md:gap-16 text-sm">
+              <div>
+                <h4 className="font-semibold text-slate-900 mb-4">Product</h4>
+                <ul className="space-y-3">
+                  <li><a href="#" className="hover:text-blue-600 transition-colors">Features</a></li>
+                  <li><a href="#" className="hover:text-blue-600 transition-colors">Pricing</a></li>
+                  <li><a href="#" className="hover:text-blue-600 transition-colors">Use Cases</a></li>
+                </ul>
+              </div>
+              <div>
+                <h4 className="font-semibold text-slate-900 mb-4">Resources</h4>
+                <ul className="space-y-3">
+                  <li><a href="#" className="hover:text-blue-600 transition-colors">Interview Tips</a></li>
+                  <li><a href="#" className="hover:text-blue-600 transition-colors">Pitch Templates</a></li>
+                  <li><a href="#" className="hover:text-blue-600 transition-colors">Blog</a></li>
+                </ul>
+              </div>
+              <div>
+                <h4 className="font-semibold text-slate-900 mb-4">Company</h4>
+                <ul className="space-y-3">
+                  <li><a href="#" className="hover:text-blue-600 transition-colors">About Us</a></li>
+                  <li><a href="#" className="hover:text-blue-600 transition-colors">Contact</a></li>
+                  <li><a href="#" className="hover:text-blue-600 transition-colors">Privacy Policy</a></li>
+                </ul>
+              </div>
+            </div>
           </div>
           
-          <div className="flex gap-8 text-sm font-medium">
-            <a href="#" className="hover:text-slate-900 transition-colors">Contact</a>
-            <a href="#" className="hover:text-slate-900 transition-colors">Privacy</a>
-            <a href="#" className="hover:text-slate-900 transition-colors">Terms</a>
-          </div>
-          
-          <div className="text-sm">
-            &copy; {new Date().getFullYear()} Pitch Ready. All rights reserved.
+          <div className="pt-8 border-t border-slate-100 flex flex-col md:flex-row justify-between items-center gap-4 text-xs font-medium">
+            <div className="flex items-center gap-1">
+              &copy; {new Date().getFullYear()} Pitch Ready. Built for the WLU Hackathon.
+            </div>
           </div>
         </div>
       </footer>
