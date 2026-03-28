@@ -1,6 +1,6 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 
-const FILLER_WORDS = ['um', 'uh', 'like', 'so', 'basically', 'literally', 'you know', 'actually'];
+const FILLER_WORDS = ['um', 'umm', 'uh', 'uhh', 'er', 'ah', 'hmm', 'like', 'so', 'basically', 'literally', 'you know', 'actually'];
 
 export function useSpeechRecognition() {
   const [isListening, setIsListening] = useState(false);
@@ -18,8 +18,10 @@ export function useSpeechRecognition() {
   const isListeningRef = useRef(false);
   const processedIndicesRef = useRef<Set<number>>(new Set());
   const restartTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const wordCountRef = useRef(0);
+  const finalWordCountRef = useRef(0);
+  const interimWordCountRef = useRef(0);
   const wordCountHistoryRef = useRef<{ time: number; count: number }[]>([]);
+  const interimFillerRef = useRef<Set<string>>(new Set());
 
   const SpeechRecognitionAPI = typeof window !== 'undefined'
     ? (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition
@@ -36,7 +38,8 @@ export function useSpeechRecognition() {
       const regex = new RegExp(`\\b${filler}\\b`, 'gi');
       const matches = lower.match(regex);
       if (matches) {
-        found[filler] = matches.length;
+        const canonical = filler === 'umm' ? 'um' : filler === 'uhh' ? 'uh' : filler;
+        found[canonical] = (found[canonical] || 0) + matches.length;
         count += matches.length;
       }
     }
@@ -53,9 +56,11 @@ export function useSpeechRecognition() {
     setTotalFillers(0);
     setCurrentWPM(0);
     setWpmSamples([]);
-    wordCountRef.current = 0;
+    finalWordCountRef.current = 0;
+    interimWordCountRef.current = 0;
     wordCountHistoryRef.current = [];
     processedIndicesRef.current = new Set();
+    interimFillerRef.current = new Set();
     startTimeRef.current = Date.now();
 
     const recognition = new SpeechRecognitionAPI();
@@ -85,11 +90,29 @@ export function useSpeechRecognition() {
         }
       }
 
+      // Count interim words for live WPM
+      const interimWords = interim.trim().split(/\s+/).filter((w: string) => w.length > 0);
+      interimWordCountRef.current = interimWords.length;
+
+      // Check interim text for fillers that Chrome often removes from final results
+      if (interim) {
+        const { found: interimFound } = detectFillers(interim);
+        for (const [word] of Object.entries(interimFound)) {
+          const key = `${word}_${Math.floor(Date.now() / 2000)}`;
+          if (!interimFillerRef.current.has(key)) {
+            interimFillerRef.current.add(key);
+            setFillerWords(prev => ({ ...prev, [word]: (prev[word] || 0) + interimFound[word] }));
+            setTotalFillers(prev => prev + interimFound[word]);
+          }
+        }
+      }
+
       if (newFinalText.trim()) {
         setTranscript(prev => prev + newFinalText);
 
         const newWords = newFinalText.trim().split(/\s+/).filter((w: string) => w.length > 0);
-        wordCountRef.current += newWords.length;
+        finalWordCountRef.current += newWords.length;
+        interimWordCountRef.current = 0;
         setWords(prev => [...prev, ...newWords]);
 
         const { found, count } = detectFillers(newFinalText);
@@ -145,7 +168,7 @@ export function useSpeechRecognition() {
     wpmIntervalRef.current = setInterval(() => {
       const now = Date.now();
       const elapsed = now - startTimeRef.current;
-      const total = wordCountRef.current;
+      const total = finalWordCountRef.current + interimWordCountRef.current;
 
       wordCountHistoryRef.current.push({ time: now, count: total });
 
@@ -154,19 +177,15 @@ export function useSpeechRecognition() {
         return;
       }
 
-      const history = wordCountHistoryRef.current;
-
-      // Use a 15-second sliding window, or full elapsed if < 15s
       const windowMs = Math.min(15000, elapsed);
       const cutoff = now - windowMs;
 
-      // Find the snapshot closest to the window start
       let baseCount = 0;
       let baseTime = startTimeRef.current;
-      for (let i = history.length - 1; i >= 0; i--) {
-        if (history[i].time <= cutoff) {
-          baseCount = history[i].count;
-          baseTime = history[i].time;
+      for (let i = wordCountHistoryRef.current.length - 1; i >= 0; i--) {
+        if (wordCountHistoryRef.current[i].time <= cutoff) {
+          baseCount = wordCountHistoryRef.current[i].count;
+          baseTime = wordCountHistoryRef.current[i].time;
           break;
         }
       }
