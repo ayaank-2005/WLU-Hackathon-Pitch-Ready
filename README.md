@@ -1,4 +1,4 @@
-# PresentSense
+# Pitch Ready
 
 A browser-based presentation rehearsal platform that helps students improve eye contact, pacing, clarity, and verbal delivery before graded presentations, interviews, and public speaking events.
 

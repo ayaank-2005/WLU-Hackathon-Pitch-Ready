@@ -64,7 +64,7 @@ export default function Setup() {
             <div className="w-7 h-7 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold text-sm">
               P
             </div>
-            <span className="font-semibold text-lg tracking-tight">PresentSense.</span>
+            <span className="font-semibold text-lg tracking-tight">Pitch Ready.</span>
           </div>
           <div className="w-16" />
         </div>

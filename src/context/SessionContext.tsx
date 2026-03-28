@@ -36,7 +36,7 @@ interface SessionContextType {
 
 const SessionContext = createContext<SessionContextType | null>(null);
 
-const STORAGE_KEY = 'presentsense_prev_results';
+const STORAGE_KEY = 'pitchready_prev_results';
 
 export function SessionProvider({ children }: { children: ReactNode }) {
   const [script, setScript] = useState('');

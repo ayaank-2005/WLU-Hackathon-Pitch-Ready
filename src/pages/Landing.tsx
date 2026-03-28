@@ -38,7 +38,7 @@ export default function Landing() {
             <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center text-blue-600 font-bold text-xl">
               P
             </div>
-            <span className="text-white font-semibold text-xl tracking-tight">PresentSense.</span>
+            <span className="text-white font-semibold text-xl tracking-tight">Pitch Ready.</span>
           </div>
 
           <nav className="hidden md:flex items-center gap-8 text-white/90 text-sm font-medium">
@@ -118,7 +118,7 @@ export default function Landing() {
             <div className="flex-1 flex justify-center">
               <div className="bg-white border border-slate-200 rounded-md px-32 py-1 text-xs text-slate-400 flex items-center gap-2 shadow-sm">
                 <LayoutTemplate className="w-3 h-3" />
-                app.presentsense.com/rehearse
+                app.pitchready.com/rehearse
               </div>
             </div>
             <div className="w-16"></div>
@@ -301,7 +301,7 @@ export default function Landing() {
             <div className="w-6 h-6 bg-slate-800 rounded flex items-center justify-center text-white font-bold text-xs">
               P
             </div>
-            <span className="text-white font-medium">PresentSense</span>
+            <span className="text-white font-medium">Pitch Ready</span>
           </div>
 
           <div className="flex gap-8 text-sm">
@@ -311,7 +311,7 @@ export default function Landing() {
           </div>
 
           <div className="text-sm">
-            &copy; {new Date().getFullYear()} PresentSense. All rights reserved.
+            &copy; {new Date().getFullYear()} Pitch Ready. All rights reserved.
           </div>
         </div>
       </footer>
