@@ -75,8 +75,8 @@ export default function Session() {
     timer.start();
     speech.start();
 
-    if (hasCamera) {
-      eyeTracking.startTracking();
+    if (hasCamera && streamRef.current) {
+      eyeTracking.startTracking(streamRef.current);
     }
 
     startAutoScroll();
@@ -109,6 +109,7 @@ export default function Session() {
     const hasEyeData = hasCamera && eyeTracking.isTracking;
     const results = computeResults({
       duration: timer.seconds,
+      script: session.script,
       transcript: speech.transcript,
       words: speech.words,
       fillerWords: speech.fillerWords,
@@ -396,6 +397,10 @@ export default function Session() {
                 <span className={`text-xs font-bold ${eyeInfo.color} ${eyeInfo.bg} px-2 py-1 rounded-md`}>
                   {eyeInfo.label}
                 </span>
+              ) : eyeTracking.error ? (
+                <span className="text-xs font-bold text-red-500 bg-red-50 px-2 py-1 rounded-md">
+                  Error
+                </span>
               ) : (
                 <span className="text-xs font-bold text-slate-400 bg-slate-100 px-2 py-1 rounded-md">
                   {eyeTracking.isLoading ? 'Loading...' : hasCamera ? 'Starting...' : 'No Camera'}
@@ -409,7 +414,11 @@ export default function Session() {
               />
             </div>
             <div className="mt-2 text-xs text-slate-500 text-right">
-              {eyeTracking.isTracking ? `${eyeTracking.eyeContactPercent}% looking at camera` : 'Tracking gaze...'}
+              {eyeTracking.error
+                ? <span className="text-red-500">{eyeTracking.error}</span>
+                : eyeTracking.isTracking
+                  ? `${eyeTracking.eyeContactPercent}% looking at camera`
+                  : 'Tracking gaze...'}
             </div>
           </div>
 

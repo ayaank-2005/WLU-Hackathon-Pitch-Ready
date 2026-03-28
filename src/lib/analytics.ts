@@ -3,8 +3,38 @@ import type { SessionResults, WPMSample } from '../context/SessionContext';
 const IDEAL_WPM_MIN = 120;
 const IDEAL_WPM_MAX = 150;
 
+function normalize(text: string): string[] {
+  return text
+    .toLowerCase()
+    .replace(/[^a-z0-9\s']/g, '')
+    .split(/\s+/)
+    .filter(w => w.length > 0);
+}
+
+function calculateScriptAccuracy(script: string, transcript: string): number {
+  const scriptWords = normalize(script);
+  const spokenWords = normalize(transcript);
+  if (scriptWords.length === 0 || spokenWords.length === 0) return 0;
+
+  let j = 0;
+  let matched = 0;
+  for (let i = 0; i < scriptWords.length && j < spokenWords.length; i++) {
+    while (j < spokenWords.length) {
+      if (spokenWords[j] === scriptWords[i]) {
+        matched++;
+        j++;
+        break;
+      }
+      j++;
+    }
+  }
+
+  return Math.round((matched / scriptWords.length) * 100);
+}
+
 export function computeResults(data: {
   duration: number;
+  script: string;
   transcript: string;
   words: string[];
   fillerWords: Record<string, number>;
@@ -13,7 +43,7 @@ export function computeResults(data: {
   eyeContactPercent: number;
   hasEyeTracking: boolean;
 }): SessionResults {
-  const { duration, transcript, words, fillerWords, totalFillers, wpmSamples, eyeContactPercent, hasEyeTracking } = data;
+  const { duration, script, transcript, words, fillerWords, totalFillers, wpmSamples, eyeContactPercent, hasEyeTracking } = data;
 
   const averageWPM = duration > 0
     ? Math.round((words.length / duration) * 60)
@@ -46,11 +76,13 @@ export function computeResults(data: {
   }
   fillerScore = Math.max(0, Math.round(fillerScore));
 
-  const overallScore = hasEyeTracking
-    ? Math.round(paceScore * 0.3 + eyeContactScore * 0.35 + fillerScore * 0.35)
-    : Math.round(paceScore * 0.5 + fillerScore * 0.5);
+  const scriptAccuracy = calculateScriptAccuracy(script, transcript);
 
-  const tips = generateTips({ averageWPM, eyeContactPercent, fillerWords, totalFillers, fillersPerMinute, hasEyeTracking });
+  const overallScore = hasEyeTracking
+    ? Math.round(paceScore * 0.25 + eyeContactScore * 0.25 + fillerScore * 0.25 + scriptAccuracy * 0.25)
+    : Math.round(paceScore * 0.35 + fillerScore * 0.35 + scriptAccuracy * 0.3);
+
+  const tips = generateTips({ averageWPM, eyeContactPercent, fillerWords, totalFillers, fillersPerMinute, hasEyeTracking, scriptAccuracy });
 
   return {
     duration,
@@ -64,6 +96,7 @@ export function computeResults(data: {
     paceScore,
     eyeContactScore,
     fillerScore,
+    scriptAccuracy,
     tips,
     hasEyeTracking,
   };
@@ -76,6 +109,7 @@ function generateTips(data: {
   totalFillers: number;
   fillersPerMinute: number;
   hasEyeTracking: boolean;
+  scriptAccuracy: number;
 }): string[] {
   const tips: string[] = [];
 
@@ -97,14 +131,22 @@ function generateTips(data: {
     }
   }
 
+  if (data.scriptAccuracy < 50) {
+    tips.push(`Script accuracy was ${data.scriptAccuracy}% \u2014 try practicing your script a few more times to improve recall. Focus on key phrases and transitions.`);
+  } else if (data.scriptAccuracy < 80) {
+    tips.push(`Good script recall at ${data.scriptAccuracy}%. You\u2019re hitting the main points \u2014 keep rehearsing to nail the exact wording.`);
+  } else if (data.scriptAccuracy > 0) {
+    tips.push(`Excellent script accuracy at ${data.scriptAccuracy}%! You know your material well.`);
+  }
+
   if (data.totalFillers > 0) {
     const topFiller = Object.entries(data.fillerWords).sort((a, b) => b[1] - a[1])[0];
     if (topFiller) {
-      tips.push(`You used \u201c${topFiller[0]}\u201d ${topFiller[1]} time${topFiller[1] > 1 ? 's' : ''}, mostly during transitions. Try replacing fillers with a brief pause \u2014 silence sounds more confident than \u201cum.\u201d`);
+      tips.push(`You used \u201c${topFiller[0]}\u201d ${topFiller[1]} time${topFiller[1] > 1 ? 's' : ''}. Try replacing fillers with a brief pause \u2014 silence sounds more confident than \u201cum.\u201d`);
     }
   } else {
     tips.push(`No filler words detected \u2014 impressive! Clean speech makes you sound more prepared and confident.`);
   }
 
-  return tips.slice(0, 3);
+  return tips.slice(0, 4);
 }

@@ -1,25 +1,46 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
+import { FaceLandmarker, FilesetResolver } from '@mediapipe/tasks-vision';
 
-const CAMERA_ZONE = {
-  xMin: 0.2,
-  xMax: 0.8,
-  yMin: 0,
-  yMax: 0.3,
-};
+let landmarkerPromise: Promise<FaceLandmarker> | null = null;
 
-function loadWebGazer(): Promise<any> {
-  if ((window as any).webgazer) return Promise.resolve((window as any).webgazer);
+async function getLandmarker(): Promise<FaceLandmarker> {
+  if (landmarkerPromise) return landmarkerPromise;
 
-  return new Promise((resolve, reject) => {
-    const script = document.createElement('script');
-    script.src = 'https://webgazer.cs.brown.edu/webgazer.js';
-    script.onload = () => {
-      if ((window as any).webgazer) resolve((window as any).webgazer);
-      else reject(new Error('WebGazer loaded but not available on window'));
-    };
-    script.onerror = () => reject(new Error('Failed to load WebGazer script'));
-    document.head.appendChild(script);
-  });
+  landmarkerPromise = (async () => {
+    const vision = await FilesetResolver.forVisionTasks(
+      'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision/wasm'
+    );
+    return FaceLandmarker.createFromOptions(vision, {
+      baseOptions: {
+        modelAssetPath:
+          'https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task',
+        delegate: 'GPU',
+      },
+      runningMode: 'VIDEO',
+      numFaces: 1,
+      outputFaceBlendshapes: false,
+      outputFacialTransformationMatrixes: false,
+    });
+  })();
+
+  return landmarkerPromise;
+}
+
+function isLookingForward(landmarks: Array<{ x: number; y: number; z: number }>): boolean {
+  if (!landmarks || landmarks.length < 264) return false;
+
+  const nose = landmarks[1];
+  const eyeL = landmarks[33];
+  const eyeR = landmarks[263];
+  if (!nose || !eyeL || !eyeR) return false;
+
+  const minX = Math.min(eyeL.x, eyeR.x);
+  const maxX = Math.max(eyeL.x, eyeR.x);
+  const span = maxX - minX;
+  if (span < 0.01) return false;
+
+  const ratio = (nose.x - minX) / span;
+  return ratio >= 0.15 && ratio <= 0.85;
 }
 
 export function useEyeTracking() {
@@ -33,41 +54,88 @@ export function useEyeTracking() {
   const lookingSamplesRef = useRef<boolean[]>([]);
   const isTrackingRef = useRef(false);
   const updateIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const webgazerRef = useRef<any>(null);
+  const rafRef = useRef<number | null>(null);
+  const hiddenVideoRef = useRef<HTMLVideoElement | null>(null);
+  const landmarkerRef = useRef<FaceLandmarker | null>(null);
 
-  const startTracking = useCallback(async () => {
+  const cleanup = useCallback(() => {
+    if (updateIntervalRef.current) {
+      clearInterval(updateIntervalRef.current);
+      updateIntervalRef.current = null;
+    }
+    if (rafRef.current) {
+      cancelAnimationFrame(rafRef.current);
+      rafRef.current = null;
+    }
+    if (hiddenVideoRef.current) {
+      hiddenVideoRef.current.srcObject = null;
+      hiddenVideoRef.current.remove();
+      hiddenVideoRef.current = null;
+    }
+  }, []);
+
+  const startTracking = useCallback(async (stream: MediaStream) => {
     setIsLoading(true);
     setError(null);
+    lookingSamplesRef.current = [];
 
     try {
-      const wg = await loadWebGazer();
-      webgazerRef.current = wg;
+      const video = document.createElement('video');
+      video.srcObject = stream;
+      video.muted = true;
+      video.playsInline = true;
+      video.autoplay = true;
+      video.style.cssText = 'position:fixed;top:-9999px;left:-9999px;width:1px;height:1px;opacity:0;pointer-events:none';
+      document.body.appendChild(video);
+      hiddenVideoRef.current = video;
 
-      wg.params.showVideoPreview = false;
-      wg.setRegression('ridge')
-        .setGazeListener((data: any) => {
-          if (data) {
-            const x = data.x / window.innerWidth;
-            const y = data.y / window.innerHeight;
-            setGazePosition({ x: data.x, y: data.y });
+      await video.play();
+      await new Promise<void>(resolve => {
+        if (video.readyState >= 2) return resolve();
+        video.addEventListener('loadeddata', () => resolve(), { once: true });
+      });
 
-            const looking = x >= CAMERA_ZONE.xMin && x <= CAMERA_ZONE.xMax &&
-                            y >= CAMERA_ZONE.yMin && y <= CAMERA_ZONE.yMax;
-            setIsLookingAtCamera(looking);
-            lookingSamplesRef.current.push(looking);
-          }
-        });
-
-      wg.showVideo(false);
-      wg.showPredictionPoints(false);
-      wg.showFaceOverlay(false);
-      wg.showFaceFeedbackBox(false);
-
-      await wg.begin();
+      const landmarker = await getLandmarker();
+      landmarkerRef.current = landmarker;
 
       setIsTracking(true);
       isTrackingRef.current = true;
       setIsLoading(false);
+
+      let lastTime = -1;
+
+      const processFrame = () => {
+        if (!isTrackingRef.current || !hiddenVideoRef.current) return;
+
+        const v = hiddenVideoRef.current;
+        const now = performance.now();
+
+        if (v.readyState >= 2 && v.videoWidth > 0 && now !== lastTime) {
+          lastTime = now;
+          try {
+            const result = landmarker.detectForVideo(v, now);
+
+            if (result.faceLandmarks && result.faceLandmarks.length > 0) {
+              const lm = result.faceLandmarks[0];
+              const looking = isLookingForward(lm);
+              setIsLookingAtCamera(looking);
+              lookingSamplesRef.current.push(looking);
+
+              const nose = lm[1];
+              if (nose) setGazePosition({ x: nose.x * v.videoWidth, y: nose.y * v.videoHeight });
+            } else {
+              setIsLookingAtCamera(false);
+              lookingSamplesRef.current.push(false);
+            }
+          } catch { /* skip frame */ }
+        }
+
+        if (isTrackingRef.current) {
+          rafRef.current = requestAnimationFrame(processFrame);
+        }
+      };
+
+      rafRef.current = requestAnimationFrame(processFrame);
 
       updateIntervalRef.current = setInterval(() => {
         const samples = lookingSamplesRef.current;
@@ -79,32 +147,16 @@ export function useEyeTracking() {
     } catch (err: any) {
       setIsLoading(false);
       setError(err?.message || 'Eye tracking unavailable');
-      console.warn('Eye tracking failed:', err);
+      console.warn('Eye tracking init failed:', err);
+      cleanup();
     }
-  }, []);
+  }, [cleanup]);
 
   const stopTracking = useCallback(() => {
     isTrackingRef.current = false;
     setIsTracking(false);
-
-    if (updateIntervalRef.current) {
-      clearInterval(updateIntervalRef.current);
-      updateIntervalRef.current = null;
-    }
-
-    if (webgazerRef.current) {
-      try {
-        webgazerRef.current.end();
-      } catch { /* already ended */ }
-      webgazerRef.current = null;
-    }
-
-    // Clean up any WebGazer DOM elements
-    ['webgazerVideoContainer', 'webgazerVideoFeed', 'webgazerFaceFeedbackBox', 'webgazerGazeDot'].forEach(id => {
-      const el = document.getElementById(id);
-      if (el) el.remove();
-    });
-  }, []);
+    cleanup();
+  }, [cleanup]);
 
   const getFinalPercent = useCallback(() => {
     const samples = lookingSamplesRef.current;

@@ -72,7 +72,7 @@ export default function InterviewSession() {
     setPhase('answering');
     timer.start();
     speech.start();
-    if (hasCamera) eyeTracking.startTracking();
+    if (hasCamera && streamRef.current) eyeTracking.startTracking(streamRef.current);
   };
 
   const submitAnswer = useCallback(async () => {
@@ -162,6 +162,7 @@ export default function InterviewSession() {
     const hasEyeData = hasCamera && eyeTracking.isTracking;
     const baseResults = computeResults({
       duration: timer.seconds,
+      script: '',
       transcript: allTranscripts,
       words: allWords,
       fillerWords: speech.fillerWords,

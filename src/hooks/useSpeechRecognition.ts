@@ -17,6 +17,8 @@ export function useSpeechRecognition() {
   const wordTimestampsRef = useRef<number[]>([]);
   const wpmIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const isListeningRef = useRef(false);
+  const processedIndicesRef = useRef<Set<number>>(new Set());
+  const restartTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const SpeechRecognitionAPI = typeof window !== 'undefined'
     ? (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition
@@ -26,7 +28,9 @@ export function useSpeechRecognition() {
 
   const calculateWPM = useCallback(() => {
     const now = Date.now();
-    const windowMs = 15000;
+    const elapsed = now - startTimeRef.current;
+    if (elapsed < 2000) return 0;
+    const windowMs = Math.min(15000, elapsed);
     const recentWords = wordTimestampsRef.current.filter(t => now - t < windowMs);
     return recentWords.length > 0
       ? Math.round((recentWords.length / windowMs) * 60000)
@@ -60,6 +64,8 @@ export function useSpeechRecognition() {
     setCurrentWPM(0);
     setWpmSamples([]);
     wordTimestampsRef.current = [];
+    processedIndicesRef.current = new Set();
+    startTimeRef.current = Date.now();
 
     const recognition = new SpeechRecognitionAPI();
     recognition.continuous = true;
@@ -70,31 +76,33 @@ export function useSpeechRecognition() {
     recognition.onstart = () => {
       setIsListening(true);
       isListeningRef.current = true;
-      startTimeRef.current = Date.now();
     };
 
     recognition.onresult = (event: any) => {
-      let finalText = '';
+      let newFinalText = '';
       let interim = '';
 
       for (let i = 0; i < event.results.length; i++) {
         const result = event.results[i];
         if (result.isFinal) {
-          finalText += result[0].transcript + ' ';
+          if (!processedIndicesRef.current.has(i)) {
+            processedIndicesRef.current.add(i);
+            newFinalText += result[0].transcript + ' ';
+          }
         } else {
           interim += result[0].transcript;
         }
       }
 
-      if (finalText.trim()) {
-        setTranscript(prev => prev + finalText);
+      if (newFinalText.trim()) {
+        setTranscript(prev => prev + newFinalText);
 
-        const newWords = finalText.trim().split(/\s+/).filter((w: string) => w.length > 0);
+        const newWords = newFinalText.trim().split(/\s+/).filter((w: string) => w.length > 0);
         const now = Date.now();
         newWords.forEach(() => wordTimestampsRef.current.push(now));
         setWords(prev => [...prev, ...newWords]);
 
-        const { found, count } = detectFillers(finalText);
+        const { found, count } = detectFillers(newFinalText);
         if (count > 0) {
           setFillerWords(prev => {
             const updated = { ...prev };
@@ -111,14 +119,31 @@ export function useSpeechRecognition() {
     };
 
     recognition.onerror = (event: any) => {
-      if ((event.error === 'no-speech' || event.error === 'aborted') && isListeningRef.current) {
-        try { recognition.start(); } catch { /* already started */ }
+      if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
+        isListeningRef.current = false;
+        setIsListening(false);
+        return;
+      }
+      if (isListeningRef.current) {
+        if (restartTimeoutRef.current) clearTimeout(restartTimeoutRef.current);
+        restartTimeoutRef.current = setTimeout(() => {
+          if (isListeningRef.current) {
+            processedIndicesRef.current = new Set();
+            try { recognition.start(); } catch { /* already running */ }
+          }
+        }, 300);
       }
     };
 
     recognition.onend = () => {
       if (isListeningRef.current) {
-        try { recognition.start(); } catch { /* already started */ }
+        if (restartTimeoutRef.current) clearTimeout(restartTimeoutRef.current);
+        restartTimeoutRef.current = setTimeout(() => {
+          if (isListeningRef.current) {
+            processedIndicesRef.current = new Set();
+            try { recognition.start(); } catch { /* already running */ }
+          }
+        }, 300);
       }
     };
 
@@ -136,6 +161,10 @@ export function useSpeechRecognition() {
   const stop = useCallback(() => {
     isListeningRef.current = false;
     setIsListening(false);
+    if (restartTimeoutRef.current) {
+      clearTimeout(restartTimeoutRef.current);
+      restartTimeoutRef.current = null;
+    }
     if (recognitionRef.current) {
       try { recognitionRef.current.stop(); } catch { /* not started */ }
       recognitionRef.current = null;

@@ -86,7 +86,7 @@ export default function InterviewSetup() {
         <div className="absolute inset-0 bg-gradient-to-b from-white/40 via-white/80 to-white/90"></div>
       </div>
 
-      <header className="relative z-10 bg-white/40 backdrop-blur-md border-b border-white/60 sticky top-0">
+      <header className="relative z-20 bg-white/80 backdrop-blur-xl border-b border-white/60 sticky top-0">
         <div className="max-w-3xl mx-auto px-6 py-4 flex items-center justify-between">
           <button
             onClick={() => step > 1 ? setStep(step - 1) : navigate('/mode')}
@@ -106,7 +106,7 @@ export default function InterviewSetup() {
       </header>
 
       {/* Progress Bar */}
-      <div className="relative z-10 bg-white/40 backdrop-blur-md border-b border-white/60">
+      <div className="relative z-20 bg-white/80 backdrop-blur-xl border-b border-white/60">
         <div className="max-w-3xl mx-auto px-6">
           <div className="flex gap-2 py-3">
             {[1, 2, 3].map(s => (

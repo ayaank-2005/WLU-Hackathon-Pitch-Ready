@@ -17,6 +17,7 @@ export interface SessionResults {
   paceScore: number;
   eyeContactScore: number;
   fillerScore: number;
+  scriptAccuracy: number;
   tips: string[];
   hasEyeTracking: boolean;
 }

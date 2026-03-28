@@ -33,7 +33,7 @@ export default function ModeSelect() {
       </div>
 
       {/* Header */}
-      <header className="relative z-10 bg-white/40 backdrop-blur-md border-b border-white/60 sticky top-0">
+      <header className="relative z-20 bg-white/80 backdrop-blur-xl border-b border-white/60 sticky top-0">
         <div className="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
           <button
             onClick={() => navigate('/')}

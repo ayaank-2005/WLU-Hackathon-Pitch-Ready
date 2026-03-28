@@ -6,7 +6,7 @@ import {
 import {
   ArrowLeft, RotateCcw, Eye, Activity, MessageSquareWarning, Trophy,
   TrendingUp, TrendingDown, Minus as MinusIcon, Lightbulb, Clock, FileText,
-  CheckCircle2, XCircle, MessageCircle, ChevronDown, ChevronUp
+  CheckCircle2, XCircle, MessageCircle, ChevronDown, ChevronUp, Target
 } from 'lucide-react';
 import { useSession, type InterviewResults } from '../context/SessionContext';
 import { useState } from 'react';
@@ -234,7 +234,7 @@ export default function Report() {
           </div>
 
           {/* Score Cards */}
-          <div className={`grid gap-6 mb-10 ${isInterview ? 'grid-cols-2 md:grid-cols-5' : 'grid-cols-2 md:grid-cols-4'}`}>
+          <div className={`grid gap-6 mb-10 ${isInterview ? 'grid-cols-2 md:grid-cols-6' : 'grid-cols-2 md:grid-cols-5'}`}>
             {isInterview && interviewResults && (
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -306,6 +306,23 @@ export default function Report() {
                 <div className="mt-3">
                   <DeltaBadge current={results.fillerScore} previous={previousResults.fillerScore} suffix="pts" />
                 </div>
+              )}
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5 }}
+              className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 flex flex-col items-center"
+            >
+              <ScoreCircle score={results.scriptAccuracy ?? 0} label="Accuracy" color={scoreColor(results.scriptAccuracy ?? 0)} />
+              {previousResults && previousResults.scriptAccuracy != null && (
+                <div className="mt-3">
+                  <DeltaBadge current={results.scriptAccuracy ?? 0} previous={previousResults.scriptAccuracy ?? 0} suffix="%" />
+                </div>
+              )}
+              {!results.scriptAccuracy && isInterview && (
+                <span className="mt-3 text-xs text-slate-400">N/A for interviews</span>
               )}
             </motion.div>
           </div>
