@@ -166,7 +166,7 @@ export default function Session() {
             </div>
             <h2 className="text-2xl font-semibold text-slate-900 mb-2">Get Ready</h2>
             <p className="text-slate-500">
-              Allow camera and microphone access to begin your rehearsal.
+              Allow camera and microphone so you can see yourself while practicing and get live AI feedback.
             </p>
           </div>
 
@@ -323,28 +323,38 @@ export default function Session() {
             </div>
           </div>
 
-          {/* Webcam Preview */}
+          {/* Webcam Preview — large so the user can see themselves */}
           <AnimatePresence>
             {hasCamera && (
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 20 }}
-                className="absolute bottom-4 left-4 z-20"
+                className="absolute bottom-6 left-6 z-20"
               >
-                <div className="relative rounded-xl overflow-hidden shadow-lg border-2 border-white/80">
+                <div className="relative rounded-2xl overflow-hidden shadow-2xl border-2 border-white bg-black">
                   <video
                     ref={videoRef}
                     autoPlay
                     muted
                     playsInline
-                    className="w-36 h-28 object-cover"
+                    className="w-64 h-48 object-cover mirror-video"
                   />
-                  {eyeTracking.isTracking && (
-                    <div className={`absolute top-2 right-2 w-3 h-3 rounded-full ${
-                      eyeTracking.isLookingAtCamera ? 'bg-green-400' : 'bg-amber-400'
-                    } shadow-sm`} />
-                  )}
+                  {/* Eye contact indicator bar */}
+                  <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-black/60 to-transparent flex items-end px-3 pb-1.5">
+                    <div className="flex items-center gap-2 w-full">
+                      <div className={`w-2 h-2 rounded-full shrink-0 ${
+                        eyeTracking.isTracking
+                          ? eyeTracking.isLookingAtCamera ? 'bg-green-400' : 'bg-amber-400'
+                          : 'bg-slate-400'
+                      }`} />
+                      <span className="text-[10px] font-medium text-white/80">
+                        {eyeTracking.isTracking
+                          ? eyeTracking.isLookingAtCamera ? 'Good eye contact' : 'Look at camera'
+                          : 'Camera active'}
+                      </span>
+                    </div>
+                  </div>
                 </div>
               </motion.div>
             )}
@@ -352,7 +362,7 @@ export default function Session() {
 
           {/* Live transcript overlay */}
           {speech.interimTranscript && (
-            <div className="absolute bottom-4 right-4 left-48 z-20">
+            <div className="absolute bottom-6 left-[17.5rem] right-4 z-20">
               <div className="bg-slate-900/80 backdrop-blur-sm text-white/80 text-sm rounded-lg px-4 py-2 truncate">
                 {speech.interimTranscript}
               </div>

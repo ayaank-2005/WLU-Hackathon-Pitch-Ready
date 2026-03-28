@@ -27,3 +27,7 @@ body {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
+.mirror-video {
+  transform: scaleX(-1);
+}

@@ -10,16 +10,24 @@ const TEMPLATES = [
     text: "Good morning everyone. Today I want to talk about an opportunity that could transform how we approach our market.\n\nOver the past six months, our team has identified a significant gap in the student tools space. Current solutions focus heavily on content creation but ignore delivery quality entirely.\n\nOur proposal is simple: build a platform that helps students practice and improve their speaking skills before it counts. The market opportunity is substantial — over 20 million university students give graded presentations each year.\n\nLet me walk you through our three key differentiators, our go-to-market strategy, and the financial projections that make this a compelling investment."
   },
   {
-    name: "Project Update",
-    text: "Thank you for being here. I'm excited to share our progress on the project.\n\nWe've completed the first phase of development and the results have exceeded our initial expectations. The core platform is now functional with three major features deployed.\n\nIn terms of metrics, we've seen a 40% improvement in user engagement since the last update. Our test group reported significantly higher satisfaction scores.\n\nFor the next phase, we're focusing on scalability and user feedback integration. I'll walk you through the timeline and resource requirements for each milestone."
+    name: "Job Interview",
+    text: "Hi, thank you so much for taking the time to meet with me today.\n\nMy name is [Your Name] and I'm currently finishing my degree in [Your Major] at [Your University]. I've been following your company's work in [Industry] and I'm really excited about this opportunity.\n\nIn my most recent role, I worked as [Title] where I was responsible for [Key Responsibility]. One project I'm particularly proud of is [Project Name], where I led a team of [X] people and we were able to [Key Result].\n\nI'm drawn to this position because it aligns with both my skills in [Skill 1] and [Skill 2], and my long-term goal of [Career Goal]. I'm a strong communicator who thrives in fast-paced environments.\n\nI'd love to learn more about the team and how I could contribute."
   },
   {
-    name: "Interview Intro",
-    text: "Hi, my name is [Your Name] and I'm currently studying [Your Major] at [Your University].\n\nI'm particularly interested in this role because it combines my passion for technology with my experience in project management. During my last internship, I led a team of four developers to deliver a web application that reduced manual data entry by 60%.\n\nI'm a strong communicator who thrives in collaborative environments. I believe my technical skills and leadership experience make me a great fit for this position.\n\nI'd love to tell you more about my background and hear about the team I'd be joining."
+    name: "Behavioral Q&A",
+    text: "That's a great question. Let me walk you through a specific example.\n\nDuring my internship at [Company], we ran into a situation where [Challenge or Conflict]. The stakes were high because [Why It Mattered].\n\nI took the initiative to [Action You Took]. Specifically, I [Step 1], then [Step 2], and coordinated with [Team/Person] to make sure we were aligned.\n\nThe result was [Positive Outcome]. We ended up [Measurable Result], and my manager recognized the effort by [Recognition]. That experience taught me the importance of [Key Takeaway], which is something I carry into every role."
+  },
+  {
+    name: "Project Presentation",
+    text: "Thank you for being here. I'm excited to share our progress on the project.\n\nWe've completed the first phase of development and the results have exceeded our initial expectations. The core platform is now functional with three major features deployed.\n\nIn terms of metrics, we've seen a 40% improvement in user engagement since the last update. Our test group reported significantly higher satisfaction scores.\n\nFor the next phase, we're focusing on scalability and user feedback integration. I'll walk you through the timeline and resource requirements for each milestone."
   },
   {
     name: "Thesis Defense",
     text: "Good afternoon, committee members. Thank you for your time today.\n\nMy thesis examines the relationship between digital literacy and academic performance among undergraduate students. Over the past year, I've conducted a mixed-methods study involving 300 participants across three universities.\n\nThe key findings reveal a statistically significant correlation between structured digital tool usage and improved presentation outcomes. Students who practiced with feedback tools showed a 25% improvement in delivery scores.\n\nI'll begin by reviewing the literature that motivated this research, then walk through my methodology, present the findings, and discuss their implications for educational technology design."
+  },
+  {
+    name: "Elevator Pitch",
+    text: "Hey, nice to meet you! I'm [Your Name], a [Year] year [Major] student at [University].\n\nI'm really passionate about [Area of Interest]. Right now I'm working on [Current Project or Initiative], which aims to [Goal]. We've already [Early Traction or Result].\n\nWhat excites me most is the potential to [Vision]. I'd love to chat more if you have a few minutes — I think there could be a great fit between what I'm building and what you're looking for."
   }
 ];
 
@@ -82,7 +90,7 @@ export default function Setup() {
               Prepare Your Rehearsal
             </h1>
             <p className="text-lg text-slate-500">
-              Paste your script, choose your settings, and start practicing.
+              Paste your presentation script or interview talking points, adjust settings, and start practicing.
             </p>
           </div>
 
@@ -102,7 +110,7 @@ export default function Setup() {
             <textarea
               value={localScript}
               onChange={(e) => setLocalScript(e.target.value)}
-              placeholder="Paste your presentation script or speaking notes here..."
+              placeholder="Paste your presentation script, interview answers, or speaking notes here..."
               className="w-full h-56 resize-none rounded-xl border border-slate-200 bg-slate-50 px-5 py-4 text-base text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-all leading-relaxed"
             />
           </div>
@@ -110,7 +118,7 @@ export default function Setup() {
           {/* Templates */}
           <div className="mb-8">
             <h3 className="text-sm font-medium text-slate-500 mb-3">Or start with a template</h3>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
               {TEMPLATES.map((template, i) => (
                 <button
                   key={i}

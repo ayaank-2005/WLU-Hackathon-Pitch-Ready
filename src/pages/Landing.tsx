@@ -72,13 +72,13 @@ export default function Landing() {
 
             {/* Headline */}
             <h1 className="text-5xl md:text-7xl font-medium text-slate-900 tracking-tight leading-[1.1] mb-6 max-w-4xl">
-              Presentation Rehearsal <br className="hidden md:block" />
-              Built for Students
+              Ace Every Presentation <br className="hidden md:block" />
+              & Interview
             </h1>
 
             {/* Subheadline */}
             <p className="text-lg md:text-xl text-slate-600 font-normal max-w-2xl mx-auto mb-10 leading-relaxed">
-              Bring your script, camera, and real-time feedback into one powerful rehearsal workspace. Fast, private, and tailored to help you ace your pitch.
+              Practice presentations and interviews with your webcam, see yourself speak, and get real-time AI feedback on eye contact, pacing, and filler words.
             </p>
 
             {/* CTAs */}
@@ -231,10 +231,10 @@ export default function Landing() {
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-5xl font-medium text-slate-900 mb-6 tracking-tight">
-              Deliver perfect presentations.<br />From your browser.
+              Practice with your camera on.<br />Improve with every run.
             </h2>
             <p className="text-lg text-slate-500 max-w-2xl mx-auto">
-              Bring together your script, camera, and real-time feedback into one powerful rehearsal workspace. No downloads required.
+              Bring together your script, webcam, and AI-powered feedback into one rehearsal workspace — so you can see yourself improve in real time.
             </p>
           </div>
 
@@ -246,7 +246,7 @@ export default function Landing() {
               </div>
               <h3 className="text-xl font-semibold text-slate-900 mb-3">Live Eye Tracking</h3>
               <p className="text-slate-500 mb-8 leading-relaxed">
-                Maintain strong audience connection. Our browser-based AI tracks your gaze to ensure you aren't just reading off the screen.
+                See yourself on camera while AI tracks your gaze. Know exactly when you're making eye contact and when you're drifting to your notes.
               </p>
               <div className="bg-slate-50 rounded-xl p-4 border border-slate-100">
                 <div className="flex justify-between items-center mb-2">
@@ -266,7 +266,7 @@ export default function Landing() {
               </div>
               <h3 className="text-xl font-semibold text-slate-900 mb-3">Pace & Rhythm</h3>
               <p className="text-slate-500 mb-8 leading-relaxed">
-                Nervous presenters talk fast. We monitor your words-per-minute in real time and gently nudge you to slow down if you rush.
+                Whether it's a pitch or a behavioral interview, pacing matters. We monitor your words-per-minute live and nudge you to slow down when you rush.
               </p>
               <div className="bg-slate-50 rounded-xl p-4 border border-slate-100 flex items-end gap-3 h-[76px]">
                 {[40, 60, 100, 140, 160, 130].map((h, i) => (
@@ -282,7 +282,7 @@ export default function Landing() {
               </div>
               <h3 className="text-xl font-semibold text-slate-900 mb-3">Filler Word Detection</h3>
               <p className="text-slate-500 mb-8 leading-relaxed">
-                Catch the "ums", "ahs", and "likes" before your professor does. Get a detailed breakdown of your crutch words after every run.
+                Catch the "ums", "ahs", and "likes" before your interviewer or professor does. Get a detailed breakdown of your crutch words after every run.
               </p>
               <div className="bg-slate-50 rounded-xl p-4 border border-slate-100 flex flex-wrap gap-2">
                 <span className="px-3 py-1.5 bg-white border border-red-100 text-red-600 rounded-lg text-sm font-medium shadow-sm">like (4)</span>
@@ -326,15 +326,15 @@ export default function Landing() {
       {/* Use Cases */}
       <section className="py-24 bg-slate-50 border-y border-slate-100 overflow-hidden">
         <div className="max-w-4xl mx-auto px-6 text-center">
-          <h2 className="text-3xl md:text-4xl font-medium text-slate-900 mb-6 tracking-tight">Practice for any occasion.</h2>
-          <p className="text-lg text-slate-500 mb-16">Whether it's a grade, a job, or funding on the line, be ready.</p>
+          <h2 className="text-3xl md:text-4xl font-medium text-slate-900 mb-6 tracking-tight">Practice for any high-stakes moment.</h2>
+          <p className="text-lg text-slate-500 mb-16">Whether it's a grade, a job offer, or funding on the line — be ready.</p>
           
           <div className="flex flex-wrap justify-center gap-6 md:gap-12">
             {[
               { icon: GraduationCap, label: "Class Presentations", color: "bg-purple-100 text-purple-600" },
-              { icon: Briefcase, label: "Job Interviews", color: "bg-blue-100 text-blue-600" },
+              { icon: Briefcase, label: "Job & Co-op Interviews", color: "bg-blue-100 text-blue-600" },
               { icon: Users, label: "Startup Pitches", color: "bg-emerald-100 text-emerald-600" },
-              { icon: Video, label: "Thesis Defense", color: "bg-rose-100 text-rose-600" }
+              { icon: Video, label: "Thesis & Case Defenses", color: "bg-rose-100 text-rose-600" }
             ].map((item, i) => (
               <div key={i} className="flex flex-col items-center gap-3">
                 <div className={`w-16 h-16 rounded-2xl flex items-center justify-center ${item.color} shadow-sm`}>
@@ -417,7 +417,7 @@ export default function Landing() {
           <div className="absolute inset-0 bg-gradient-to-t from-white/40 via-white/80 to-white"></div>
         </div>
         <div className="relative z-10 max-w-3xl mx-auto px-6 text-center">
-          <h2 className="text-4xl md:text-5xl font-medium text-slate-900 mb-6 tracking-tight">Ready to ace your next pitch?</h2>
+          <h2 className="text-4xl md:text-5xl font-medium text-slate-900 mb-6 tracking-tight">Ready to ace your next pitch or interview?</h2>
           <p className="text-lg text-slate-600 mb-10">Join thousands of students who practice smarter, not harder.</p>
           <button
             onClick={() => navigate('/setup')}
