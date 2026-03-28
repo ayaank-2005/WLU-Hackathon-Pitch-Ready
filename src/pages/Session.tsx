@@ -72,14 +72,6 @@ export default function Session() {
 
   const startSession = async () => {
     setPhase('active');
-    timer.start();
-    speech.start();
-
-    if (hasCamera && streamRef.current) {
-      eyeTracking.startTracking(streamRef.current);
-    }
-
-    startAutoScroll();
   };
 
   const togglePause = () => {
@@ -122,6 +114,23 @@ export default function Session() {
     session.setResults(results);
     navigate('/report');
   }, [timer, speech, eyeTracking, hasCamera, session, navigate]);
+
+  useEffect(() => {
+    if (phase !== 'active') return;
+
+    if (videoRef.current && streamRef.current) {
+      videoRef.current.srcObject = streamRef.current;
+    }
+
+    timer.start();
+    speech.start();
+
+    if (hasCamera && streamRef.current) {
+      eyeTracking.startTracking(streamRef.current);
+    }
+
+    startAutoScroll();
+  }, [phase]);
 
   useEffect(() => {
     return () => {
