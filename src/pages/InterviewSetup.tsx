@@ -73,8 +73,20 @@ export default function InterviewSetup() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 font-sans">
-      <header className="bg-white border-b border-slate-200 sticky top-0 z-10">
+    <div className="min-h-screen text-slate-900 font-sans relative">
+      {/* Soft Cloud Background */}
+      <div 
+        className="fixed inset-0 z-0"
+        style={{
+          backgroundImage: "url('https://images.unsplash.com/photo-1509803874385-db7c23652552?q=80&w=2070&auto=format&fit=crop')",
+          backgroundSize: "cover",
+          backgroundPosition: "center top",
+        }}
+      >
+        <div className="absolute inset-0 bg-gradient-to-b from-white/40 via-white/80 to-white/90"></div>
+      </div>
+
+      <header className="relative z-10 bg-white/40 backdrop-blur-md border-b border-white/60 sticky top-0">
         <div className="max-w-3xl mx-auto px-6 py-4 flex items-center justify-between">
           <button
             onClick={() => step > 1 ? setStep(step - 1) : navigate('/mode')}
@@ -84,7 +96,7 @@ export default function InterviewSetup() {
             {step > 1 ? 'Back' : 'Choose Mode'}
           </button>
           <div className="flex items-center gap-2">
-            <div className="w-7 h-7 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold text-sm">
+            <div className="w-7 h-7 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold text-sm shadow-sm">
               P
             </div>
             <span className="font-semibold text-lg tracking-tight">Pitch Ready.</span>
@@ -94,7 +106,7 @@ export default function InterviewSetup() {
       </header>
 
       {/* Progress Bar */}
-      <div className="bg-white border-b border-slate-100">
+      <div className="relative z-10 bg-white/40 backdrop-blur-md border-b border-white/60">
         <div className="max-w-3xl mx-auto px-6">
           <div className="flex gap-2 py-3">
             {[1, 2, 3].map(s => (
@@ -109,7 +121,7 @@ export default function InterviewSetup() {
         </div>
       </div>
 
-      <main className="max-w-3xl mx-auto px-6 py-10">
+      <main className="relative z-10 max-w-3xl mx-auto px-6 py-10">
         <AnimatePresence mode="wait">
           {/* Step 1: Job Details */}
           {step === 1 && (
@@ -126,7 +138,7 @@ export default function InterviewSetup() {
               </div>
 
               <div className="space-y-6">
-                <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 space-y-5">
+                <div className="bg-white/60 backdrop-blur-xl rounded-2xl border border-white shadow-[0_8px_30px_rgb(0,0,0,0.04)] p-6 space-y-5">
                   <div>
                     <label className="text-sm font-medium text-slate-700 mb-2 block">
                       <Briefcase className="w-4 h-4 inline mr-2 text-blue-500" />
@@ -137,7 +149,7 @@ export default function InterviewSetup() {
                       value={jobTitle}
                       onChange={e => setJobTitle(e.target.value)}
                       placeholder="e.g. Software Engineering Intern, Product Manager"
-                      className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-base placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-all"
+                      className="w-full rounded-xl border border-white bg-white/50 px-4 py-3 text-base placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-all shadow-sm"
                     />
                   </div>
 
@@ -151,7 +163,7 @@ export default function InterviewSetup() {
                       value={company}
                       onChange={e => setCompany(e.target.value)}
                       placeholder="e.g. Google, Shopify, TD Bank"
-                      className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-base placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-all"
+                      className="w-full rounded-xl border border-white bg-white/50 px-4 py-3 text-base placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-all shadow-sm"
                     />
                   </div>
 
@@ -163,7 +175,7 @@ export default function InterviewSetup() {
                       <select
                         value={roleType}
                         onChange={e => setRoleType(e.target.value as RoleType)}
-                        className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-base appearance-none focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-all cursor-pointer"
+                        className="w-full rounded-xl border border-white bg-white/50 px-4 py-3 text-base appearance-none focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-all cursor-pointer shadow-sm"
                       >
                         {ROLE_OPTIONS.map(opt => (
                           <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -203,7 +215,7 @@ export default function InterviewSetup() {
               </div>
 
               <div className="space-y-6">
-                <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
+                <div className="bg-white/60 backdrop-blur-xl rounded-2xl border border-white shadow-[0_8px_30px_rgb(0,0,0,0.04)] p-6">
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-2 text-sm font-medium text-slate-700">
                       <FileText className="w-4 h-4 text-blue-500" />
@@ -219,7 +231,7 @@ export default function InterviewSetup() {
                     value={jobDescription}
                     onChange={e => setJobDescription(e.target.value)}
                     placeholder="Paste the full job posting here... (optional but recommended for AI-generated questions)"
-                    className="w-full h-64 resize-none rounded-xl border border-slate-200 bg-slate-50 px-5 py-4 text-base text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-all leading-relaxed"
+                    className="w-full h-64 resize-none rounded-xl border border-white bg-white/50 px-5 py-4 text-base text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-all leading-relaxed shadow-sm"
                   />
                 </div>
 
@@ -258,7 +270,7 @@ export default function InterviewSetup() {
 
               <div className="space-y-6">
                 {/* Question Count */}
-                <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
+                <div className="bg-white/60 backdrop-blur-xl rounded-2xl border border-white shadow-[0_8px_30px_rgb(0,0,0,0.04)] p-6">
                   <label className="text-sm font-medium text-slate-700 mb-4 block">
                     <Clock className="w-4 h-4 inline mr-2 text-blue-500" />
                     Number of Questions
@@ -271,7 +283,7 @@ export default function InterviewSetup() {
                         className={`py-4 rounded-xl text-center transition-all border-2 ${
                           questionCount === count
                             ? 'bg-blue-50 border-blue-500 text-blue-700'
-                            : 'bg-white border-slate-200 text-slate-600 hover:border-blue-200 hover:bg-blue-50/30'
+                            : 'bg-white/50 border-white text-slate-600 shadow-sm hover:border-blue-200 hover:bg-white'
                         }`}
                       >
                         <div className="text-2xl font-bold">{count}</div>
@@ -284,7 +296,7 @@ export default function InterviewSetup() {
                 </div>
 
                 {/* API Key (Optional) */}
-                <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
+                <div className="bg-white/60 backdrop-blur-xl rounded-2xl border border-white shadow-[0_8px_30px_rgb(0,0,0,0.04)] p-6">
                   <button
                     onClick={() => setShowApiKey(!showApiKey)}
                     className="flex items-center justify-between w-full text-left"
@@ -314,7 +326,7 @@ export default function InterviewSetup() {
                           value={apiKey}
                           onChange={e => setApiKey(e.target.value)}
                           placeholder="sk-..."
-                          className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-mono placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-all"
+                          className="w-full rounded-xl border border-white bg-white/50 px-4 py-3 text-sm font-mono placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-all shadow-sm"
                         />
                       </motion.div>
                     )}
@@ -322,8 +334,8 @@ export default function InterviewSetup() {
                 </div>
 
                 {/* Summary */}
-                <div className="bg-slate-100/60 rounded-2xl p-5 border border-slate-200/50">
-                  <h4 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Interview Summary</h4>
+                <div className="bg-white/40 backdrop-blur-md rounded-2xl p-5 border border-white shadow-[0_4px_20px_rgb(0,0,0,0.02)]">
+                  <h4 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">Interview Summary</h4>
                   <div className="grid grid-cols-2 gap-3 text-sm">
                     <div><span className="text-slate-500">Role:</span> <span className="font-medium text-slate-800">{jobTitle || '—'}</span></div>
                     {company && <div><span className="text-slate-500">Company:</span> <span className="font-medium text-slate-800">{company}</span></div>}

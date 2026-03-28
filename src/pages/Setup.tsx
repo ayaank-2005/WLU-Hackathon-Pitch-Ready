@@ -57,9 +57,21 @@ export default function Setup() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 font-sans">
+    <div className="min-h-screen text-slate-900 font-sans relative">
+      {/* Soft Cloud Background */}
+      <div 
+        className="fixed inset-0 z-0"
+        style={{
+          backgroundImage: "url('https://images.unsplash.com/photo-1509803874385-db7c23652552?q=80&w=2070&auto=format&fit=crop')",
+          backgroundSize: "cover",
+          backgroundPosition: "center top",
+        }}
+      >
+        <div className="absolute inset-0 bg-gradient-to-b from-white/40 via-white/80 to-white/90"></div>
+      </div>
+
       {/* Header */}
-      <header className="bg-white border-b border-slate-200 sticky top-0 z-10">
+      <header className="relative z-10 bg-white/40 backdrop-blur-md border-b border-white/60 sticky top-0">
         <div className="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
           <button
             onClick={() => navigate('/mode')}
@@ -69,7 +81,7 @@ export default function Setup() {
             Choose Mode
           </button>
           <div className="flex items-center gap-2">
-            <div className="w-7 h-7 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold text-sm">
+            <div className="w-7 h-7 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold text-sm shadow-sm">
               P
             </div>
             <span className="font-semibold text-lg tracking-tight">Pitch Ready.</span>
@@ -79,7 +91,7 @@ export default function Setup() {
       </header>
 
       {/* Main Content */}
-      <main className="max-w-4xl mx-auto px-6 py-12">
+      <main className="relative z-10 max-w-4xl mx-auto px-6 py-12">
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
@@ -95,7 +107,7 @@ export default function Setup() {
           </div>
 
           {/* Script Input */}
-          <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 mb-8">
+          <div className="bg-white/60 backdrop-blur-xl rounded-2xl border border-white shadow-[0_8px_30px_rgb(0,0,0,0.04)] p-6 mb-8">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2 text-sm font-medium text-slate-700">
                 <FileText className="w-4 h-4 text-blue-500" />
@@ -107,12 +119,12 @@ export default function Setup() {
                 </div>
               )}
             </div>
-            <textarea
-              value={localScript}
-              onChange={(e) => setLocalScript(e.target.value)}
-              placeholder="Paste your presentation script, interview answers, or speaking notes here..."
-              className="w-full h-56 resize-none rounded-xl border border-slate-200 bg-slate-50 px-5 py-4 text-base text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-all leading-relaxed"
-            />
+              <textarea
+                value={localScript}
+                onChange={(e) => setLocalScript(e.target.value)}
+                placeholder="Paste your presentation script, interview answers, or speaking notes here..."
+                className="w-full h-56 resize-none rounded-xl border border-white bg-white/50 px-5 py-4 text-base text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-all leading-relaxed shadow-sm"
+              />
           </div>
 
           {/* Templates */}
@@ -123,7 +135,7 @@ export default function Setup() {
                 <button
                   key={i}
                   onClick={() => applyTemplate(template.text)}
-                  className="px-4 py-3 rounded-xl border border-slate-200 bg-white hover:border-blue-300 hover:bg-blue-50/50 text-sm font-medium text-slate-700 transition-all text-left"
+                  className="px-4 py-3 rounded-xl border border-white bg-white/60 backdrop-blur-md hover:border-blue-200 hover:bg-white shadow-[0_4px_20px_rgb(0,0,0,0.02)] text-sm font-medium text-slate-700 transition-all text-left"
                 >
                   {template.name}
                 </button>
@@ -132,7 +144,7 @@ export default function Setup() {
           </div>
 
           {/* Settings */}
-          <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 mb-10">
+          <div className="bg-white/60 backdrop-blur-xl rounded-2xl border border-white shadow-[0_8px_30px_rgb(0,0,0,0.04)] p-6 mb-10">
             <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-5">
               Teleprompter Settings
             </h3>
@@ -145,7 +157,7 @@ export default function Setup() {
                 <div className="flex items-center gap-4">
                   <button
                     onClick={() => setLocalFontSize(Math.max(20, localFontSize - 4))}
-                    className="w-10 h-10 rounded-lg border border-slate-200 flex items-center justify-center hover:bg-slate-50 transition-colors"
+                    className="w-10 h-10 rounded-lg border border-white bg-white/50 shadow-sm flex items-center justify-center hover:bg-white transition-colors"
                   >
                     <Minus className="w-4 h-4 text-slate-500" />
                   </button>
@@ -155,7 +167,7 @@ export default function Setup() {
                   </div>
                   <button
                     onClick={() => setLocalFontSize(Math.min(56, localFontSize + 4))}
-                    className="w-10 h-10 rounded-lg border border-slate-200 flex items-center justify-center hover:bg-slate-50 transition-colors"
+                    className="w-10 h-10 rounded-lg border border-white bg-white/50 shadow-sm flex items-center justify-center hover:bg-white transition-colors"
                   >
                     <Plus className="w-4 h-4 text-slate-500" />
                   </button>
@@ -176,7 +188,7 @@ export default function Setup() {
                       className={`flex-1 py-2.5 rounded-lg text-sm font-medium transition-all ${
                         localSpeed === i + 1
                           ? 'bg-blue-600 text-white shadow-sm'
-                          : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                          : 'bg-white/50 border border-white shadow-sm text-slate-600 hover:bg-white'
                       }`}
                     >
                       {label}
