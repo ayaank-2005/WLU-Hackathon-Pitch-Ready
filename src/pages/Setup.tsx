@@ -207,16 +207,21 @@ export default function Setup() {
             <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-2 flex items-center gap-2">
               <Sparkles className="w-4 h-4 text-amber-500" />
               AI-Powered Coaching
+              <span className="text-[10px] font-bold bg-green-100 text-green-700 px-1.5 py-0.5 rounded uppercase tracking-wide">Free</span>
             </h3>
             <p className="text-xs text-slate-400 mb-4">
-              Add your OpenAI API key to get personalized AI feedback on your delivery after each session. Without a key you'll still get rule-based tips.
+              Paste a free Google Gemini API key for personalized AI feedback after each session.{' '}
+              <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:text-blue-600 underline">
+                Get one here
+              </a>{' '}
+              (no credit card needed). Without a key you'll still get rule-based tips.
             </p>
             <div className="relative">
               <input
                 type={showKey ? 'text' : 'password'}
                 value={localApiKey}
                 onChange={(e) => setLocalApiKey(e.target.value)}
-                placeholder="sk-..."
+                placeholder="AIza..."
                 className="w-full rounded-xl border border-white bg-white/50 px-4 py-3 pr-10 text-sm text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-all shadow-sm font-mono"
               />
               <button

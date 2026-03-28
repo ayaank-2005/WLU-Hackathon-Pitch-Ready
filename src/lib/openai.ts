@@ -86,6 +86,27 @@ Evaluate the answer and respond with ONLY a JSON object (no markdown, no other t
   }
 }
 
+const GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
+
+async function geminiGenerate(apiKey: string, prompt: string): Promise<string> {
+  const res = await fetch(`${GEMINI_URL}?key=${apiKey}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      contents: [{ parts: [{ text: prompt }] }],
+      generationConfig: { temperature: 0.6, maxOutputTokens: 1024 },
+    }),
+  });
+
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(`Gemini API error (${res.status}): ${err}`);
+  }
+
+  const data = await res.json();
+  return data.candidates?.[0]?.content?.parts?.[0]?.text?.trim() ?? '';
+}
+
 export async function generatePresentationTips(
   apiKey: string,
   data: {
@@ -137,7 +158,7 @@ Return ONLY a JSON array of 4-5 tip strings. Each tip should be 1-2 sentences, s
 
 Example format: ["Your opening lacked a hook...", "You said 'like' 8 times..."]`;
 
-  const raw = await chatCompletion(apiKey, [{ role: 'user', content: prompt }], 0.6);
+  const raw = await geminiGenerate(apiKey, prompt);
 
   try {
     const match = raw.match(/\[[\s\S]*\]/);
