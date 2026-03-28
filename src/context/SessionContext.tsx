@@ -60,6 +60,10 @@ interface SessionContextType {
   mode: AppMode;
   setMode: (mode: AppMode) => void;
 
+  // Shared
+  apiKey: string;
+  setApiKey: (key: string) => void;
+
   // Presentation mode
   script: string;
   setScript: (script: string) => void;
@@ -86,9 +90,17 @@ interface SessionContextType {
 const SessionContext = createContext<SessionContextType | null>(null);
 
 const STORAGE_KEY = 'pitchready_prev_results';
+const API_KEY_STORAGE = 'pitchready_api_key';
 
 export function SessionProvider({ children }: { children: ReactNode }) {
   const [mode, setMode] = useState<AppMode>('presentation');
+  const [apiKey, setApiKeyState] = useState(() => {
+    try { return localStorage.getItem(API_KEY_STORAGE) ?? ''; } catch { return ''; }
+  });
+  const setApiKey = useCallback((key: string) => {
+    setApiKeyState(key);
+    try { localStorage.setItem(API_KEY_STORAGE, key); } catch { /* ignore */ }
+  }, []);
   const [script, setScript] = useState('');
   const [fontSize, setFontSize] = useState(32);
   const [scrollSpeed, setScrollSpeed] = useState(2);
@@ -124,6 +136,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
   return (
     <SessionContext.Provider value={{
       mode, setMode,
+      apiKey, setApiKey,
       script, setScript,
       fontSize, setFontSize,
       scrollSpeed, setScrollSpeed,

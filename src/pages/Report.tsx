@@ -6,10 +6,11 @@ import {
 import {
   ArrowLeft, RotateCcw, Eye, Activity, MessageSquareWarning, Trophy,
   TrendingUp, TrendingDown, Minus as MinusIcon, Lightbulb, Clock, FileText,
-  CheckCircle2, XCircle, MessageCircle, ChevronDown, ChevronUp, Target
+  CheckCircle2, XCircle, MessageCircle, ChevronDown, ChevronUp, Target, Sparkles
 } from 'lucide-react';
 import { useSession, type InterviewResults } from '../context/SessionContext';
-import { useState } from 'react';
+import { generatePresentationTips } from '../lib/openai';
+import { useState, useEffect, useRef } from 'react';
 
 function ScoreCircle({ score, label, color, size = 100 }: {
   score: number; label: string; color: string; size?: number;
@@ -140,7 +141,31 @@ function QuestionCard({ index, answer }: {
 
 export default function Report() {
   const navigate = useNavigate();
-  const { results, previousResults, mode, interviewAnswers } = useSession();
+  const { results, previousResults, mode, interviewAnswers, apiKey, script } = useSession();
+  const [aiTips, setAiTips] = useState<string[] | null>(null);
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiError, setAiError] = useState(false);
+  const aiCalledRef = useRef(false);
+
+  useEffect(() => {
+    if (!results || !apiKey || mode === 'interview' || aiCalledRef.current) return;
+    aiCalledRef.current = true;
+    setAiLoading(true);
+
+    generatePresentationTips(apiKey, {
+      script,
+      transcript: results.transcript,
+      averageWPM: results.averageWPM,
+      eyeContactPercent: results.eyeContactPercent,
+      fillerWords: results.fillerWords,
+      totalFillers: results.totalFillers,
+      duration: results.duration,
+      hasEyeTracking: results.hasEyeTracking,
+      scriptAccuracy: results.scriptAccuracy,
+    })
+      .then(tips => { setAiTips(tips); setAiLoading(false); })
+      .catch(() => { setAiError(true); setAiLoading(false); });
+  }, [results, apiKey, script, mode]);
 
   if (!results) {
     return (
@@ -420,11 +445,38 @@ export default function Report() {
             </div>
           </div>
 
+          {/* AI Tips */}
+          {(aiLoading || aiTips) && (
+            <div className="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-2xl border border-indigo-200/60 shadow-sm p-6 mb-6">
+              <h3 className="text-sm font-semibold text-indigo-700 mb-4 flex items-center gap-2">
+                <Sparkles className="w-4 h-4 text-indigo-500" />
+                AI Coaching Feedback
+              </h3>
+              {aiLoading ? (
+                <div className="flex items-center gap-3 py-4">
+                  <div className="w-5 h-5 border-2 border-indigo-300 border-t-indigo-600 rounded-full animate-spin" />
+                  <span className="text-sm text-indigo-500">Analyzing your presentation...</span>
+                </div>
+              ) : aiTips && (
+                <div className="space-y-4">
+                  {aiTips.map((tip, i) => (
+                    <div key={i} className="flex gap-3">
+                      <span className="flex-shrink-0 w-7 h-7 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center text-sm font-bold">
+                        {i + 1}
+                      </span>
+                      <p className="text-slate-700 leading-relaxed pt-0.5">{tip}</p>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
           {/* Tips */}
           <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 mb-10">
             <h3 className="text-sm font-semibold text-slate-700 mb-4 flex items-center gap-2">
               <Lightbulb className="w-4 h-4 text-amber-500" />
-              Personalized Tips
+              {aiTips ? 'Quick Stats' : 'Personalized Tips'}
             </h3>
             <div className="space-y-4">
               {results.tips.map((tip, i) => (

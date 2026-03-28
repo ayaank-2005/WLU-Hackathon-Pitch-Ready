@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'motion/react';
-import { ArrowLeft, ArrowRight, FileText, Minus, Plus, Gauge } from 'lucide-react';
+import { ArrowLeft, ArrowRight, FileText, Minus, Plus, Gauge, Sparkles, Eye, EyeOff } from 'lucide-react';
 import { useSession } from '../context/SessionContext';
 
 const TEMPLATES = [
@@ -39,6 +39,8 @@ export default function Setup() {
   const [localScript, setLocalScript] = useState(session.script);
   const [localFontSize, setLocalFontSize] = useState(session.fontSize);
   const [localSpeed, setLocalSpeed] = useState(session.scrollSpeed);
+  const [localApiKey, setLocalApiKey] = useState(session.apiKey);
+  const [showKey, setShowKey] = useState(false);
 
   const wordCount = localScript.trim() ? localScript.trim().split(/\s+/).length : 0;
   const estimatedMinutes = Math.max(1, Math.round(wordCount / 130));
@@ -48,6 +50,7 @@ export default function Setup() {
     session.setScript(localScript);
     session.setFontSize(localFontSize);
     session.setScrollSpeed(localSpeed);
+    session.setApiKey(localApiKey.trim());
     session.clearResults();
     navigate('/session');
   };
@@ -196,6 +199,33 @@ export default function Setup() {
                   ))}
                 </div>
               </div>
+            </div>
+          </div>
+
+          {/* AI Tips */}
+          <div className="bg-white/60 backdrop-blur-xl rounded-2xl border border-white shadow-[0_8px_30px_rgb(0,0,0,0.04)] p-6 mb-10">
+            <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-2 flex items-center gap-2">
+              <Sparkles className="w-4 h-4 text-amber-500" />
+              AI-Powered Coaching
+            </h3>
+            <p className="text-xs text-slate-400 mb-4">
+              Add your OpenAI API key to get personalized AI feedback on your delivery after each session. Without a key you'll still get rule-based tips.
+            </p>
+            <div className="relative">
+              <input
+                type={showKey ? 'text' : 'password'}
+                value={localApiKey}
+                onChange={(e) => setLocalApiKey(e.target.value)}
+                placeholder="sk-..."
+                className="w-full rounded-xl border border-white bg-white/50 px-4 py-3 pr-10 text-sm text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-all shadow-sm font-mono"
+              />
+              <button
+                type="button"
+                onClick={() => setShowKey(!showKey)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+              >
+                {showKey ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              </button>
             </div>
           </div>
 
