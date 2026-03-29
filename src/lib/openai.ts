@@ -152,6 +152,90 @@ Example format: ["Your opening lacked a hook...", "You said 'like' 8 times..."]`
   }
 }
 
+export interface InterviewTipAnswer {
+  question: string;
+  answer: string;
+  feedback?: string;
+  followUp?: string;
+  followUpAnswer?: string;
+}
+
+export async function generateInterviewTips(
+  apiKey: string,
+  data: {
+    jobTitle: string;
+    company: string;
+    roleType: string;
+    jobDescription: string;
+    answers: InterviewTipAnswer[];
+    averageWPM: number;
+    eyeContactPercent: number;
+    fillerWords: Record<string, number>;
+    totalFillers: number;
+    duration: number;
+    hasEyeTracking: boolean;
+    overallScore: number;
+    interviewScore: number;
+  },
+): Promise<string[]> {
+  const fillerSummary = Object.entries(data.fillerWords)
+    .sort((a, b) => (b[1] as number) - (a[1] as number))
+    .map(([w, c]) => `"${w}" (${c}x)`)
+    .join(', ') || 'none';
+
+  const qaBlock = data.answers
+    .map((a, i) => {
+      const parts = [
+        `Q${i + 1}: ${a.question.slice(0, 500)}`,
+        `Answer: ${(a.answer || '(no answer)').slice(0, 1200)}`,
+      ];
+      if (a.feedback) parts.push(`Prior feedback given in-session: ${a.feedback.slice(0, 400)}`);
+      if (a.followUp) parts.push(`Follow-up Q: ${a.followUp.slice(0, 400)}`);
+      if (a.followUpAnswer) parts.push(`Follow-up answer: ${a.followUpAnswer.slice(0, 800)}`);
+      return parts.join('\n');
+    })
+    .join('\n\n---\n\n');
+
+  const jd = data.jobDescription.trim().slice(0, 1500);
+
+  const prompt = `You are an expert interview coach. A candidate just finished a mock interview practice session. Give 4-5 holistic coaching tips that tie together their answers, delivery, and presence.
+
+ROLE CONTEXT:
+- Target role: "${data.jobTitle}"${data.company ? ` at ${data.company}` : ''}
+- Role type: ${data.roleType}
+${jd ? `\nJob description excerpt:\n"""\n${jd}\n"""\n` : ''}
+
+QUESTIONS AND THEIR ANSWERS (what they actually said):
+${qaBlock || '(No Q&A recorded)'}
+
+DELIVERY METRICS (same session):
+- Duration: ${Math.floor(data.duration / 60)}m ${data.duration % 60}s
+- Interview content score (app heuristic): ${data.interviewScore}/100
+- Overall delivery score: ${data.overallScore}/100
+- Average pace: ${data.averageWPM} WPM (ideal for interviews: roughly 120-150)
+- Filler words: ${data.totalFillers} total — ${fillerSummary}
+${data.hasEyeTracking ? `- Estimated eye contact toward camera: ${data.eyeContactPercent}%` : '- Eye tracking: not used or unavailable'}
+
+Instructions:
+1. Reference specific themes from their answers where possible (strengths and gaps).
+2. Mention delivery when relevant (pace, fillers, eye contact) — not generic platitudes.
+3. Suggest 1-2 concrete improvements for their next real interview.
+4. Keep each tip 1-2 sentences.
+
+Return ONLY a JSON array of 4-5 tip strings, no markdown or other text.
+Example: ["You answered X well but Y was vague — add metrics next time.", "..."]`;
+
+  const raw = await chatCompletion(apiKey, [{ role: 'user', content: prompt }], 0.55);
+
+  try {
+    const match = raw.match(/\[[\s\S]*\]/);
+    if (!match) throw new Error('No JSON array found');
+    return JSON.parse(match[0]) as string[];
+  } catch {
+    return raw.split('\n').filter(l => l.trim().length > 10).map(l => l.replace(/^\d+[\.\)]\s*/, '').replace(/^["'-]\s*/, '').trim()).filter(Boolean).slice(0, 5);
+  }
+}
+
 export function evaluateAnswerHeuristic(question: string, answer: string): AnswerEvaluation {
   const wordCount = answer.trim().split(/\s+/).filter(Boolean).length;
   const hasNumbers = /\d/.test(answer);

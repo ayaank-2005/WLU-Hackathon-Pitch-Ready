@@ -4,15 +4,22 @@ A browser-based presentation rehearsal platform that helps students improve eye 
 
 Practice once inside a clean teleprompter environment, and immediately receive actionable feedback on how you spoke, where you looked, how fast you talked, and how often you relied on filler words.
 
+## Live demo
+
+**[https://pitch-ready.xyz](https://pitch-ready.xyz)**
+
+![Pitch Ready landing page](docs/landing-screenshot.png)
+
 ## Features
 
-- **Teleprompter** — Auto-scrolling script display with adjustable font size and speed
-- **Speech Recognition** — Real-time transcription via the Web Speech API with rolling WPM calculation
-- **Filler Word Detection** — Live tracking of "um," "uh," "like," "so," "basically," "literally," "you know," and "actually"
-- **Eye Tracking** — Browser-based gaze estimation using WebGazer.js to measure camera engagement
-- **Live HUD** — Real-time sidebar showing eye contact %, speech pace, filler word badges, and session timer
-- **Post-Session Report** — Score circles, WPM timeline chart, filler breakdown, personalized tips, and full transcript
-- **Attempt Comparison** — Each session is compared against the previous one with delta badges
+- **Presentation mode** — Auto-scrolling teleprompter with adjustable font size and speed
+- **Interview mode** — Job-aware mock interviews with optional AI-generated questions and answer feedback
+- **Speech recognition** — Real-time transcription via the Web Speech API with rolling WPM calculation
+- **Filler word detection** — Live tracking of common fillers (e.g. "um," "uh," "like," "basically," "you know")
+- **Eye tracking** — Browser-based face landmarks via **MediaPipe** (`@mediapipe/tasks-vision`) to estimate camera engagement
+- **Live HUD** — Real-time sidebar with eye contact %, speech pace, filler badges, and session timer
+- **Post-session report** — Score circles, WPM timeline, filler breakdown, tips, transcript, and optional **Groq**-powered coaching
+- **Attempt comparison** — Compare sessions with delta-style feedback
 
 ## Tech Stack
 
@@ -23,7 +30,8 @@ Practice once inside a clean teleprompter environment, and immediately receive a
 - **Recharts** for data visualization
 - **React Router** for client-side routing
 - **Web Speech API** for speech recognition
-- **WebGazer.js** for browser eye tracking
+- **@mediapipe/tasks-vision** (Face Landmarker) for eye-contact estimation
+- **Groq** (OpenAI-compatible API, `openai/gpt-oss-20b`) for optional AI interview and coaching features
 - **Lucide React** for icons
 
 ## Getting Started
@@ -40,40 +48,44 @@ npm run dev
 
 The app runs at `http://localhost:3000`.
 
+For AI features in local development, set `GROQ_API_KEY` in `.env` (see `.env.example`). The Vite dev server can proxy chat requests so the key stays server-side.
+
 ## Project Structure
 
 ```
 src/
-├── App.tsx                    # Router setup
-├── main.tsx                   # Entry point
-├── index.css                  # Global styles + Tailwind
+├── App.tsx                     # Router setup
+├── main.tsx                    # Entry point
+├── index.css                   # Global styles + Tailwind
 ├── context/
-│   └── SessionContext.tsx      # Session state management
+│   └── SessionContext.tsx      # Session + interview state
 ├── hooks/
-│   ├── useTimer.ts            # Session timer with pause/resume
-│   ├── useSpeechRecognition.ts # Web Speech API wrapper
-│   └── useEyeTracking.ts      # WebGazer.js wrapper
+│   ├── useTimer.ts
+│   ├── useSpeechRecognition.ts # Web Speech API
+│   └── useEyeTracking.ts       # MediaPipe Face Landmarker
 ├── lib/
-│   └── analytics.ts           # Score computation and tip generation
+│   ├── analytics.ts            # Scores and tips
+│   ├── openai.ts               # Groq chat completions + helpers
+│   └── questions.ts            # Interview question bank (fallback)
 └── pages/
-    ├── Landing.tsx             # Marketing landing page
-    ├── Setup.tsx               # Script input, templates, settings
-    ├── Session.tsx             # Live practice with teleprompter + HUD
-    └── Report.tsx              # Post-session analytics
+    ├── Landing.tsx
+    ├── ModeSelect.tsx
+    ├── Setup.tsx / Session.tsx / Report.tsx
+    ├── InterviewSetup.tsx / InterviewSession.tsx
+    └── …                       # Tips, templates, blog, legal, Groq tutorial, etc.
 ```
 
 ## User Flow
 
-1. Land on the homepage and click **Start Practicing**
-2. Paste a script or choose a template, configure font size and scroll speed
-3. Grant camera and microphone permissions
-4. Practice your presentation with live feedback
+1. Open **[pitch-ready.xyz](https://pitch-ready.xyz)** (or run locally) and choose **Start for Free**
+2. Pick **Presentation** or **Interview** mode
+3. Paste a script (or job details for interviews), adjust settings, grant camera and microphone if prompted
+4. Practice with live feedback
 5. End the session and review your report
-6. Practice again and see how you improved
 
 ## Browser Support
 
-Speech recognition requires **Chrome** or **Edge**. Eye tracking uses WebGazer.js which works best in Chrome. The app degrades gracefully when features are unavailable — speech analytics still function without a camera, and the teleprompter works without speech recognition.
+Speech recognition works best in **Chrome** or **Edge**. Eye tracking needs camera access and a WebGL-capable browser. The app degrades gracefully when a feature is unavailable.
 
 ## Scripts
 
