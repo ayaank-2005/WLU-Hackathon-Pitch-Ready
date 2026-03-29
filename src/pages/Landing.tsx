@@ -1,13 +1,16 @@
+import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { motion } from "motion/react";
+import { motion, AnimatePresence } from "motion/react";
 import {
   ArrowRight, Play, Eye, Activity, MessageSquareWarning, BarChart3,
   Timer, CheckCircle2, LayoutTemplate, Mic, Shield, Zap, FileText,
-  LineChart, Laptop, Sparkles, Video, Users, GraduationCap, Briefcase
+  LineChart, Laptop, Sparkles, Video, Users, GraduationCap, Briefcase,
+  X
 } from "lucide-react";
 
 export default function Landing() {
   const navigate = useNavigate();
+  const [showDemo, setShowDemo] = useState(false);
 
   const scrollTo = (id: string) => {
     document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -90,7 +93,10 @@ export default function Landing() {
               >
                 Start for Free
               </button>
-              <button className="w-full sm:w-auto bg-white hover:bg-slate-50 text-slate-900 px-8 py-3.5 rounded-full text-base font-medium transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5 flex items-center justify-center gap-2 border border-slate-200">
+              <button
+                onClick={() => setShowDemo(true)}
+                className="w-full sm:w-auto bg-white hover:bg-slate-50 text-slate-900 px-8 py-3.5 rounded-full text-base font-medium transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5 flex items-center justify-center gap-2 border border-slate-200"
+              >
                 <Play className="w-4 h-4" />
                 Get a Demo
               </button>
@@ -550,6 +556,42 @@ export default function Landing() {
           </div>
         </footer>
       </div>
+
+      {/* Demo Video Modal */}
+      <AnimatePresence>
+        {showDemo && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4"
+            onClick={() => setShowDemo(false)}
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              transition={{ duration: 0.3, ease: "easeOut" }}
+              className="relative w-full max-w-4xl aspect-video rounded-2xl overflow-hidden shadow-2xl"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <button
+                onClick={() => setShowDemo(false)}
+                className="absolute -top-12 right-0 text-white/80 hover:text-white transition-colors flex items-center gap-1.5 text-sm font-medium z-10"
+              >
+                Close <X className="w-4 h-4" />
+              </button>
+              <iframe
+                src="https://www.loom.com/embed/3d08612f43e64130bb0aca04f4b0b980?autoplay=1"
+                className="w-full h-full border-0"
+                allow="autoplay; fullscreen"
+                allowFullScreen
+              />
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
