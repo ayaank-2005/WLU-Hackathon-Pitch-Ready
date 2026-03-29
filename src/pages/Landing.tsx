@@ -9,6 +9,10 @@ import {
 export default function Landing() {
   const navigate = useNavigate();
 
+  const scrollTo = (id: string) => {
+    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+
   return (
     <div className="min-h-screen bg-white text-slate-900 font-sans selection:bg-blue-200 selection:text-blue-900">
       
@@ -37,9 +41,9 @@ export default function Landing() {
           </div>
 
           <nav className="hidden md:flex items-center gap-8 text-slate-600 text-sm font-medium">
-            <a href="#features" className="hover:text-slate-900 transition-colors">Features</a>
-            <a href="#benefits" className="hover:text-slate-900 transition-colors">Benefits</a>
-            <a href="#pricing" className="hover:text-slate-900 transition-colors">Pricing</a>
+            <button onClick={() => scrollTo('features')} className="hover:text-slate-900 transition-colors">Features</button>
+            <button onClick={() => scrollTo('benefits')} className="hover:text-slate-900 transition-colors">Benefits</button>
+            <button onClick={() => scrollTo('pricing')} className="hover:text-slate-900 transition-colors">Pricing</button>
           </nav>
 
           <div className="flex items-center gap-4">
@@ -116,7 +120,7 @@ export default function Landing() {
             <div className="flex-1 flex justify-center">
               <div className="bg-white border border-slate-200 rounded-md px-24 md:px-48 py-1.5 text-xs text-slate-400 flex items-center gap-2 shadow-sm font-medium">
                 <Shield className="w-3 h-3" />
-                app.pitchready.com/rehearse
+                pitch-ready.xyz
               </div>
             </div>
             <div className="w-16"></div>
@@ -517,9 +521,9 @@ export default function Landing() {
                 <div>
                   <h4 className="font-semibold text-slate-900 mb-4">Product</h4>
                   <ul className="space-y-3">
-                    <li><a href="#features" className="hover:text-blue-600 transition-colors">Features</a></li>
-                    <li><a href="#pricing" className="hover:text-blue-600 transition-colors">Pricing</a></li>
-                    <li><a href="#use-cases" className="hover:text-blue-600 transition-colors">Use Cases</a></li>
+                    <li><button onClick={() => scrollTo('features')} className="hover:text-blue-600 transition-colors">Features</button></li>
+                    <li><button onClick={() => scrollTo('pricing')} className="hover:text-blue-600 transition-colors">Pricing</button></li>
+                    <li><button onClick={() => scrollTo('use-cases')} className="hover:text-blue-600 transition-colors">Use Cases</button></li>
                   </ul>
                 </div>
                 <div>

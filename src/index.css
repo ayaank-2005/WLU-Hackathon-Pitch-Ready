@@ -6,6 +6,10 @@
   --font-mono: ui-monospace, "SF Mono", "Cascadia Code", "Fira Code", monospace;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   font-family: "Inter", sans-serif;
   -webkit-font-smoothing: antialiased;
