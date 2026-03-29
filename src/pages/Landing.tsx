@@ -47,9 +47,6 @@ export default function Landing() {
           </nav>
 
           <div className="flex items-center gap-4">
-            <button className="hidden md:block text-slate-600 hover:text-slate-900 text-sm font-medium transition-colors">
-              Log in
-            </button>
             <button
               onClick={() => navigate('/mode')}
               className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-full text-sm font-medium transition-all shadow-sm hover:shadow-md"

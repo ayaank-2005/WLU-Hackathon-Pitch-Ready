@@ -7,7 +7,7 @@ import { useSession } from '../context/SessionContext';
 const TEMPLATES = [
   {
     name: "Business Pitch",
-    text: "Good morning everyone. Today I want to talk about an opportunity that could transform how we approach our market.\n\nOver the past six months, our team has identified a significant gap in the student tools space. Current solutions focus heavily on content creation but ignore delivery quality entirely.\n\nOur proposal is simple: build a platform that helps students practice and improve their speaking skills before it counts. The market opportunity is substantial — over 20 million university students give graded presentations each year.\n\nLet me walk you through our three key differentiators, our go-to-market strategy, and the financial projections that make this a compelling investment."
+    text: "Good morning everyone. Today I want to talk about an opportunity that could transform how we approach our market.\n\nOver the last few days, our team has identified a significant gap in the student tools space. Current solutions focus heavily on content creation but ignore delivery quality entirely.\n\nOur proposal is simple: build a platform that helps students practice and improve their speaking skills before it counts. The market opportunity is substantial — over 20 million university students give graded presentations each year.\n\nLet me walk you through our three key differentiators, our go-to-market strategy, and the financial projections that make this a compelling investment."
   },
   {
     name: "Job Interview",
