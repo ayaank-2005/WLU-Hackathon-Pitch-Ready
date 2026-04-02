@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import {
   Timer, Eye, Activity, MessageSquareWarning, Mic,
-  Video, VideoOff, Square, ArrowLeft, AlertCircle,
+  Video, VideoOff, Square, ArrowLeft, AlertCircle, Volume2,
   ChevronRight, Loader2, CheckCircle2, XCircle, Send
 } from 'lucide-react';
 import { useSession, type InterviewAnswer, type InterviewResults } from '../context/SessionContext';
@@ -35,6 +35,52 @@ export default function InterviewSession() {
 
   const [allTranscripts, setAllTranscripts] = useState('');
   const [allWords, setAllWords] = useState<string[]>([]);
+  const [isSpeaking, setIsSpeaking] = useState(false);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  const stopAudio = useCallback(() => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.onended = null;
+      audioRef.current.onerror = null;
+      audioRef.current = null;
+    }
+    window.speechSynthesis.cancel();
+    setIsSpeaking(false);
+  }, []);
+
+  const speakText = useCallback(async (text: string): Promise<void> => {
+    stopAudio();
+    try {
+      const res = await fetch('/api/tts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text }),
+      });
+      if (!res.ok) throw new Error('TTS request failed');
+
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const audio = new Audio(url);
+      audioRef.current = audio;
+
+      return new Promise<void>((resolve) => {
+        audio.onplay = () => setIsSpeaking(true);
+        audio.onended = () => { setIsSpeaking(false); URL.revokeObjectURL(url); audioRef.current = null; resolve(); };
+        audio.onerror = () => { setIsSpeaking(false); URL.revokeObjectURL(url); audioRef.current = null; resolve(); };
+        audio.play().catch(() => { setIsSpeaking(false); resolve(); });
+      });
+    } catch {
+      return new Promise<void>((resolve) => {
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.rate = 0.9;
+        utterance.onstart = () => setIsSpeaking(true);
+        utterance.onend = () => { setIsSpeaking(false); resolve(); };
+        utterance.onerror = () => { setIsSpeaking(false); resolve(); };
+        window.speechSynthesis.speak(utterance);
+      });
+    }
+  }, [stopAudio]);
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
@@ -73,21 +119,32 @@ export default function InterviewSession() {
   };
 
   useEffect(() => {
-    if (phase !== 'answering' || timer.seconds > 0) return;
+    if (phase !== 'answering') return;
 
-    if (videoRef.current && streamRef.current) {
-      videoRef.current.srcObject = streamRef.current;
+    if (timer.seconds === 0) {
+      if (videoRef.current && streamRef.current) {
+        videoRef.current.srcObject = streamRef.current;
+      }
+      timer.start();
+      if (hasCamera && streamRef.current) {
+        eyeTracking.startTracking(streamRef.current);
+      }
     }
 
-    timer.start();
-    speech.start();
+    speakText(currentQuestion).then(() => {
+      speech.start();
+    });
+  }, [phase, currentIndex]);
 
-    if (hasCamera && streamRef.current) {
-      eyeTracking.startTracking(streamRef.current);
-    }
+  useEffect(() => {
+    if (phase !== 'followup' || !currentEval?.followUp) return;
+    speakText(currentEval.followUp).then(() => {
+      speech.start();
+    });
   }, [phase]);
 
   const submitAnswer = useCallback(async () => {
+    stopAudio();
     const answerText = speech.transcript.trim();
     speech.stop();
 
@@ -119,7 +176,6 @@ export default function InterviewSession() {
   const handleFollowUp = () => {
     setIsFollowUp(true);
     setFollowUpTranscript('');
-    speech.start();
     setPhase('followup');
   };
 
@@ -157,11 +213,11 @@ export default function InterviewSession() {
     } else {
       setCurrentIndex(prev => prev + 1);
       setPhase('answering');
-      speech.start();
     }
   }, [currentIndex, totalQuestions]);
 
   const endInterview = useCallback(() => {
+    stopAudio();
     timer.stop();
     speech.stop();
     eyeTracking.stopTracking();
@@ -200,6 +256,7 @@ export default function InterviewSession() {
 
   useEffect(() => {
     return () => {
+      stopAudio();
       streamRef.current?.getTracks().forEach(t => t.stop());
     };
   }, []);
@@ -372,6 +429,19 @@ export default function InterviewSession() {
             {isFollowUp && (
               <div className="mt-2 text-xs text-indigo-500 font-medium">Follow-up question</div>
             )}
+            <AnimatePresence>
+              {isSpeaking && (
+                <motion.div
+                  initial={{ opacity: 0, y: 4 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0 }}
+                  className="mt-3 flex items-center gap-2 text-blue-500"
+                >
+                  <Volume2 className="w-4 h-4 animate-pulse" />
+                  <span className="text-sm font-medium">Interviewer is speaking...</span>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
 
           {/* Answer / Feedback Area */}
