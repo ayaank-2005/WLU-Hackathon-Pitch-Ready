@@ -11,9 +11,9 @@ import { useSpeechRecognition } from '../hooks/useSpeechRecognition';
 import { useEyeTracking } from '../hooks/useEyeTracking';
 import { useTimer } from '../hooks/useTimer';
 import { computeResults } from '../lib/analytics';
-import { evaluateAnswer, evaluateAnswerHeuristic, type AnswerEvaluation } from '../lib/openai';
+import { evaluateAnswer, evaluateAnswerHeuristic, generateNextQuestion, type AnswerEvaluation } from '../lib/openai';
 
-type Phase = 'setup' | 'active' | 'answering' | 'evaluating' | 'feedback' | 'followup';
+type Phase = 'setup' | 'active' | 'answering' | 'evaluating' | 'feedback' | 'followup' | 'preparing';
 
 export default function InterviewSession() {
   const navigate = useNavigate();
@@ -37,6 +37,11 @@ export default function InterviewSession() {
   const [allWords, setAllWords] = useState<string[]>([]);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  const accFillers = useRef<Record<string, number>>({});
+  const accFillerCount = useRef(0);
+  const accWpmSamples = useRef<{ time: number; wpm: number }[]>([]);
+  const currentQAccumulated = useRef(false);
 
   const stopAudio = useCallback(() => {
     if (audioRef.current) {
@@ -65,19 +70,26 @@ export default function InterviewSession() {
       audioRef.current = audio;
 
       return new Promise<void>((resolve) => {
+        const timeout = setTimeout(() => { setIsSpeaking(false); resolve(); }, 30000);
         audio.onplay = () => setIsSpeaking(true);
-        audio.onended = () => { setIsSpeaking(false); URL.revokeObjectURL(url); audioRef.current = null; resolve(); };
-        audio.onerror = () => { setIsSpeaking(false); URL.revokeObjectURL(url); audioRef.current = null; resolve(); };
-        audio.play().catch(() => { setIsSpeaking(false); resolve(); });
+        audio.onended = () => { clearTimeout(timeout); setIsSpeaking(false); URL.revokeObjectURL(url); audioRef.current = null; resolve(); };
+        audio.onerror = () => { clearTimeout(timeout); setIsSpeaking(false); URL.revokeObjectURL(url); audioRef.current = null; resolve(); };
+        audio.play().catch(() => { clearTimeout(timeout); setIsSpeaking(false); resolve(); });
       });
     } catch {
       return new Promise<void>((resolve) => {
+        let resolved = false;
+        const done = () => { if (!resolved) { resolved = true; setIsSpeaking(false); resolve(); } };
+
         const utterance = new SpeechSynthesisUtterance(text);
         utterance.rate = 0.9;
         utterance.onstart = () => setIsSpeaking(true);
-        utterance.onend = () => { setIsSpeaking(false); resolve(); };
-        utterance.onerror = () => { setIsSpeaking(false); resolve(); };
+        utterance.onend = done;
+        utterance.onerror = done;
         window.speechSynthesis.speak(utterance);
+
+        const estimatedMs = Math.max(3000, (text.split(/\s+/).length / 2.5) * 1000 + 1500);
+        setTimeout(done, estimatedMs);
       });
     }
   }, [stopAudio]);
@@ -146,6 +158,14 @@ export default function InterviewSession() {
   const submitAnswer = useCallback(async () => {
     stopAudio();
     const answerText = speech.transcript.trim();
+
+    for (const [word, count] of Object.entries(speech.fillerWords)) {
+      accFillers.current[word] = (accFillers.current[word] || 0) + (count as number);
+    }
+    accFillerCount.current += speech.totalFillers;
+    accWpmSamples.current.push(...speech.wpmSamples);
+    currentQAccumulated.current = true;
+
     speech.stop();
 
     setAllTranscripts(prev => prev + ' ' + answerText);
@@ -155,7 +175,7 @@ export default function InterviewSession() {
 
     let evaluation: AnswerEvaluation;
     try {
-      evaluation = await evaluateAnswer(apiKey ?? '', currentQuestion, answerText, config!.jobTitle);
+      evaluation = await evaluateAnswer(apiKey ?? '', currentQuestion, answerText, config!.jobTitle, config!.company, config!.jobDescription);
     } catch {
       evaluation = evaluateAnswerHeuristic(currentQuestion, answerText);
     }
@@ -203,21 +223,17 @@ export default function InterviewSession() {
     moveToNext();
   };
 
-  const moveToNext = useCallback(() => {
-    setCurrentEval(null);
-    setIsFollowUp(false);
-    setFollowUpTranscript('');
-
-    if (currentIndex + 1 >= totalQuestions) {
-      endInterview();
-    } else {
-      setCurrentIndex(prev => prev + 1);
-      setPhase('answering');
-    }
-  }, [currentIndex, totalQuestions]);
-
   const endInterview = useCallback(() => {
     stopAudio();
+
+    if (!currentQAccumulated.current) {
+      for (const [word, count] of Object.entries(speech.fillerWords)) {
+        accFillers.current[word] = (accFillers.current[word] || 0) + (count as number);
+      }
+      accFillerCount.current += speech.totalFillers;
+      accWpmSamples.current.push(...speech.wpmSamples);
+    }
+
     timer.stop();
     speech.stop();
     eyeTracking.stopTracking();
@@ -229,9 +245,9 @@ export default function InterviewSession() {
       script: '',
       transcript: allTranscripts,
       words: allWords,
-      fillerWords: speech.fillerWords,
-      totalFillers: speech.totalFillers,
-      wpmSamples: speech.wpmSamples,
+      fillerWords: { ...accFillers.current },
+      totalFillers: accFillerCount.current,
+      wpmSamples: [...accWpmSamples.current],
       eyeContactPercent: hasEyeData ? eyeTracking.getFinalPercent() : 0,
       hasEyeTracking: hasEyeData,
     });
@@ -253,6 +269,54 @@ export default function InterviewSession() {
     session.setResults(interviewResults);
     navigate('/report');
   }, [timer, speech, eyeTracking, hasCamera, allTranscripts, allWords, answers, totalQuestions, session, navigate]);
+
+  const moveToNext = useCallback(async () => {
+    setCurrentEval(null);
+    setIsFollowUp(false);
+    setFollowUpTranscript('');
+
+    if (currentIndex + 1 >= totalQuestions) {
+      endInterview();
+      return;
+    }
+
+    const nextIndex = currentIndex + 1;
+
+    if (apiKey && config) {
+      setPhase('preparing');
+      try {
+        const previousQA = answers.map(a => ({
+          question: a.question,
+          answer: a.answer,
+          ...(a.followUpAnswer ? { followUpAnswer: a.followUpAnswer } : {}),
+        }));
+        const nextQ = await Promise.race([
+          generateNextQuestion(
+            apiKey,
+            config.jobTitle,
+            config.company,
+            config.jobDescription,
+            previousQA,
+            totalQuestions - nextIndex,
+          ),
+          new Promise<string>((_, reject) =>
+            setTimeout(() => reject(new Error('timeout')), 8000),
+          ),
+        ]);
+        if (nextQ?.trim()) {
+          const updated = [...questions];
+          updated[nextIndex] = nextQ.trim();
+          session.setInterviewQuestions(updated);
+        }
+      } catch {
+        // fallback to pre-generated question
+      }
+    }
+
+    currentQAccumulated.current = false;
+    setCurrentIndex(prev => prev + 1);
+    setPhase('answering');
+  }, [currentIndex, totalQuestions, apiKey, config, answers, questions, session, endInterview]);
 
   useEffect(() => {
     return () => {
@@ -504,6 +568,22 @@ export default function InterviewSession() {
                   <div className="text-center">
                     <Loader2 className="w-8 h-8 animate-spin text-blue-500 mx-auto mb-3" />
                     <p className="text-slate-500 text-sm">Reviewing your answer...</p>
+                  </div>
+                </motion.div>
+              )}
+
+              {/* Preparing Next Question */}
+              {phase === 'preparing' && (
+                <motion.div
+                  key="preparing"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="flex items-center justify-center py-12"
+                >
+                  <div className="text-center">
+                    <Loader2 className="w-8 h-8 animate-spin text-indigo-500 mx-auto mb-3" />
+                    <p className="text-slate-500 text-sm">Tailoring next question to your responses...</p>
                   </div>
                 </motion.div>
               )}

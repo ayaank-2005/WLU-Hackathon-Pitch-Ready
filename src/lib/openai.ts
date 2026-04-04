@@ -27,12 +27,13 @@ async function chatCompletion(apiKey: string, messages: { role: string; content:
 export async function generateQuestions(
   apiKey: string,
   jobTitle: string,
+  company: string,
   jobDescription: string,
   count: number,
 ): Promise<string[]> {
-  const prompt = `You are an expert interviewer. Generate exactly ${count} interview questions for a candidate applying for the role of "${jobTitle}".
+  const prompt = `You are an expert interviewer. Generate exactly ${count} interview questions for a candidate applying for the role of "${jobTitle}"${company ? ` at ${company}` : ''}.
 
-${jobDescription ? `Here is the job description:\n\n${jobDescription}\n\n` : ''}Create a balanced mix of:
+${jobDescription ? `Here is the job description:\n\n${jobDescription}\n\n` : ''}${company ? `Consider ${company}'s culture, values, and what they typically look for in candidates.\n\n` : ''}Create a balanced mix of:
 - Behavioral questions (using STAR method)
 - Technical/role-specific questions
 - Situational questions
@@ -57,15 +58,52 @@ export interface AnswerEvaluation {
   followUp?: string;
 }
 
+export async function generateNextQuestion(
+  apiKey: string,
+  jobTitle: string,
+  company: string,
+  jobDescription: string,
+  previousQA: { question: string; answer: string; followUpAnswer?: string }[],
+  questionsRemaining: number,
+): Promise<string> {
+  const qaHistory = previousQA
+    .map((qa, i) => {
+      let entry = `Q${i + 1}: ${qa.question}\nA${i + 1}: ${qa.answer}`;
+      if (qa.followUpAnswer) entry += `\nFollow-up answer: ${qa.followUpAnswer}`;
+      return entry;
+    })
+    .join('\n\n');
+
+  const prompt = `You are an expert interviewer conducting a live interview for a "${jobTitle}" position${company ? ` at ${company}` : ''}.
+
+${jobDescription ? `Job Description:\n${jobDescription.slice(0, 1500)}\n\n` : ''}Here is the interview so far:
+
+${qaHistory}
+
+Based on the candidate's responses so far, generate the next interview question. The question should:
+- Build on themes, strengths, or gaps from the candidate's previous answers
+- Probe deeper into areas where the candidate was vague or could elaborate
+- Be relevant to the role${company ? ` and ${company}'s expectations` : ''}
+- Not repeat any previously asked question
+- ${questionsRemaining <= 2 ? 'This is near the end — make it impactful, forward-looking, or a strong closing question.' : 'Maintain a good mix of behavioral, technical, situational, and cultural-fit questions.'}
+
+Return ONLY the question text, no numbering, no quotes, no other text.`;
+
+  const raw = await chatCompletion(apiKey, [{ role: 'user', content: prompt }], 0.7);
+  return raw.replace(/^["'\d.\)]+\s*/, '').replace(/["']$/g, '').trim();
+}
+
 export async function evaluateAnswer(
   apiKey: string,
   question: string,
   answer: string,
   jobTitle: string,
+  company?: string,
+  jobDescription?: string,
 ): Promise<AnswerEvaluation> {
-  const prompt = `You are an expert interview coach evaluating a candidate's answer for a "${jobTitle}" position.
+  const prompt = `You are an expert interview coach evaluating a candidate's answer for a "${jobTitle}" position${company ? ` at ${company}` : ''}.
 
-Question asked: "${question}"
+${jobDescription ? `Relevant job context:\n${jobDescription.slice(0, 800)}\n\n` : ''}Question asked: "${question}"
 
 Candidate's answer: "${answer}"
 

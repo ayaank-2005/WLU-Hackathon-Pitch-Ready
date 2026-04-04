@@ -47,7 +47,7 @@ export default function InterviewSetup() {
       let questions: string[];
 
       try {
-        questions = await generateQuestions(apiKey.trim(), jobTitle, jobDescription, questionCount);
+        questions = await generateQuestions(apiKey.trim(), jobTitle, company, jobDescription, questionCount);
       } catch {
         questions = selectQuestions(roleType, questionCount);
       }
