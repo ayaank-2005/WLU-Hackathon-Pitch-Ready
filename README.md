@@ -1,5 +1,7 @@
 # Pitch Ready
 
+Built for the **WLU Hackathon** by **Daniel Guy**, **Laddo Logga**, **Stephen Coufie**, and **Ayaan Khan**.
+
 A browser-based presentation rehearsal platform that helps students improve eye contact, pacing, clarity, and verbal delivery before graded presentations, interviews, and public speaking events.
 
 Practice once inside a clean teleprompter environment, and immediately receive actionable feedback on how you spoke, where you looked, how fast you talked, and how often you relied on filler words.
